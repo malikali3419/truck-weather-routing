@@ -6,8 +6,8 @@ test.describe("Trip form", () => {
   });
 
   test("shows the empty state", async ({ page }) => {
-    await expect(page).toHaveTitle(/SafeHaul/);
-    await expect(page.getByRole("heading", { name: "SafeHaul" })).toBeVisible();
+    await expect(page).toHaveTitle("Weather-aware truck routing");
+    await expect(page.getByRole("heading", { name: "Weather-aware truck routing" })).toBeVisible();
     await expect(page.getByRole("form", { name: "Plan a trip" })).toBeVisible();
     await expect(page.getByText("Plan a trip to compare routes.")).toBeVisible();
     for (const trip of ["Denver → Chicago", "Dallas → Atlanta", "Seattle → Salt Lake City"]) {

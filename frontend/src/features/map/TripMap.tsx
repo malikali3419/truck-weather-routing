@@ -11,7 +11,7 @@ import { EndpointMarkers, TruckMarkers } from "./TruckMarkers";
 
 // On phones the forecast panel covers the bottom of the map.
 const IS_PHONE = typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches;
-const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+const MAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 const INTERACTIVE = ["checkpoints", "route-hit"];
 
 export function TripMap() {

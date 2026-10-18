@@ -45,14 +45,14 @@ export function ForecastPanel() {
   return (
     <section
       aria-label="Forecast timeline"
-      className="pointer-events-auto rounded-2xl border border-slate-200/80 bg-white/95 p-3 shadow-float backdrop-blur-md md:p-4"
+      className="pointer-events-auto rounded-2xl border border-white/10 bg-ink-900/80 p-3 shadow-glass backdrop-blur-xl md:p-4"
     >
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Forecast at</p>
-          <p className="text-sm font-semibold tabular-nums text-slate-900" data-testid="slider-time">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Forecast at</p>
+          <p className="text-sm font-semibold tabular-nums text-white" data-testid="slider-time">
             {formatTimeLong(time)}
-            <span className="ml-2 rounded-md bg-brand-50 px-1.5 py-0.5 text-xs text-brand-700">+{hour}h</span>
+            <span className="ml-2 rounded-md bg-sky-400/15 px-1.5 py-0.5 text-xs text-sky-300 ring-1 ring-inset ring-sky-400/25">+{hour}h</span>
           </p>
         </div>
         <Segmented
@@ -70,7 +70,7 @@ export function ForecastPanel() {
           type="button"
           onClick={() => setPlaying(!playing)}
           aria-label={playing ? "Pause forecast animation" : "Play forecast animation"}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white shadow-sm shadow-brand-600/40 transition hover:bg-brand-700"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 text-white shadow-glow transition hover:brightness-110"
         >
           {playing ? <Pause className="h-4 w-4 fill-current" /> : <Play className="ml-0.5 h-4 w-4 fill-current" />}
         </button>
@@ -90,7 +90,7 @@ export function ForecastPanel() {
             className="timeline-range w-full"
             style={{ ["--p" as string]: `${(hour / MAX_HOUR) * 100}%` }}
           />
-          <div className="mt-1 hidden justify-between text-[10px] font-medium text-slate-400 sm:flex">
+          <div className="mt-1.5 hidden justify-between text-[10px] font-medium text-slate-500 sm:flex">
             <span>Depart</span>
             <span>+12h</span>
             <span>+24h</span>
@@ -100,16 +100,16 @@ export function ForecastPanel() {
         </div>
       </div>
 
-      <div className="mt-2 hidden items-center justify-between gap-3 text-[11px] text-slate-500 sm:flex">
+      <div className="mt-2 hidden items-center justify-between gap-3 text-[11px] text-slate-400 sm:flex">
         <span className="flex items-center gap-1.5">
           {heatmap.isFetching && !heatmap.data && (
             <>
-              <Spinner className="h-3 w-3 text-brand-600" />
+              <Spinner className="h-3 w-3 text-sky-400" />
               Loading forecast grid…
             </>
           )}
           {heatmap.isError && (
-            <span className="text-red-600">
+            <span className="text-rose-300">
               Heatmap unavailable.{" "}
               <button type="button" className="font-medium underline" onClick={() => heatmap.refetch()}>
                 Retry
@@ -121,7 +121,7 @@ export function ForecastPanel() {
         <RiskLegend />
       </div>
 
-      <div className="mt-3 hidden border-t border-slate-100 pt-3 sm:block">
+      <div className="mt-3 hidden border-t border-white/[0.06] pt-3 sm:block">
         <RiskProfileStrip />
       </div>
     </section>

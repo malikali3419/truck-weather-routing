@@ -7,7 +7,7 @@ import { formatDuration } from "../../lib/format";
 import { riskColorExpression } from "../../lib/risk";
 import { useTripStore } from "../../store/useTripStore";
 
-const ALT_COLOR = "#64748b";
+const ALT_COLOR = "#7c8db5";
 
 /**
  * Alternatives are drawn in gray; only the selected route is colored by
@@ -74,7 +74,7 @@ export function RouteLayers() {
           id="route-alt-casing"
           type="line"
           layout={{ "line-join": "round", "line-cap": "round" }}
-          paint={{ "line-color": "#ffffff", "line-width": ["interpolate", ["linear"], ["zoom"], 4, 5, 10, 9] }}
+          paint={{ "line-color": "#060a13", "line-width": ["interpolate", ["linear"], ["zoom"], 4, 5, 10, 9] }}
         />
         <Layer
           id="route-alt"
@@ -82,7 +82,8 @@ export function RouteLayers() {
           layout={{ "line-join": "round", "line-cap": "round" }}
           paint={{
             "line-color": ALT_COLOR,
-            "line-opacity": 0.75,
+            "line-opacity": 0.6,
+            "line-dasharray": [2, 1.5],
             "line-width": ["interpolate", ["linear"], ["zoom"], 4, 2.5, 10, 5],
           }}
         />
@@ -90,24 +91,25 @@ export function RouteLayers() {
       </Source>
       <Source id="route-outline" type="geojson" data={outline}>
         <Layer
-          id="route-shadow"
-          type="line"
-          layout={{ "line-join": "round", "line-cap": "round" }}
-          paint={{
-            "line-color": "#0f172a",
-            "line-opacity": 0.18,
-            "line-blur": 2,
-            "line-width": ["interpolate", ["linear"], ["zoom"], 4, 11, 10, 18],
-          }}
-        />
-        <Layer
           id="route-casing"
           type="line"
           layout={{ "line-join": "round", "line-cap": "round" }}
-          paint={{ "line-color": "#ffffff", "line-width": ["interpolate", ["linear"], ["zoom"], 4, 8, 10, 13] }}
+          paint={{ "line-color": "#060a13", "line-width": ["interpolate", ["linear"], ["zoom"], 4, 8, 10, 13] }}
         />
       </Source>
       <Source id="route-selected" type="geojson" data={selected}>
+        {/* Soft neon glow in the risk colour under the route line */}
+        <Layer
+          id="route-glow"
+          type="line"
+          layout={{ "line-join": "round", "line-cap": "round" }}
+          paint={{
+            "line-color": riskColorExpression,
+            "line-opacity": 0.35,
+            "line-blur": 8,
+            "line-width": ["interpolate", ["linear"], ["zoom"], 4, 14, 10, 26],
+          }}
+        />
         <Layer
           id="route-line"
           type="line"
@@ -174,13 +176,15 @@ export function RouteLabels() {
                 selectRoute(route.id);
               }}
               aria-label={`Select route ${route.id} on map`}
-              className={`mb-1.5 flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-1 text-[11px] font-semibold shadow-float transition hover:scale-105 ${
-                selected ? "bg-brand-600 text-white" : "bg-white text-slate-700 ring-1 ring-slate-900/10"
+              className={`mb-1.5 flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-1 text-[11px] font-semibold backdrop-blur-md transition hover:scale-105 ${
+                selected
+                  ? "bg-gradient-to-r from-sky-500 to-indigo-500 text-white shadow-glow"
+                  : "bg-ink-850/90 text-slate-200 shadow-glass ring-1 ring-white/10 hover:ring-sky-400/40"
               }`}
             >
-              <span className={`rounded px-1 ${selected ? "bg-white/20" : "bg-slate-100"}`}>{route.id}</span>
+              <span className={`rounded px-1 ${selected ? "bg-white/20" : "bg-white/10"}`}>{route.id}</span>
               {formatDuration(route.duration_s)}
-              {route.id === recommendedId && <span aria-label="recommended">★</span>}
+              {route.id === recommendedId && <span aria-label="recommended" className={selected ? "" : "text-emerald-300"}>★</span>}
             </button>
           </Marker>
         );

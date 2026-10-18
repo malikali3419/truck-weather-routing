@@ -28,19 +28,19 @@ export function CheckpointTable() {
         aria-expanded={open}
         className="flex w-full items-center gap-3 px-4 py-3 text-left"
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.06] text-sky-300 ring-1 ring-inset ring-white/10">
           <MapPinned className="h-4 w-4" />
         </span>
         <span className="flex-1">
-          <span className="block text-sm font-semibold text-slate-900">Route {route.id} checkpoints</span>
-          <span className="block text-xs text-slate-500">
+          <span className="block text-sm font-semibold text-white">Route {route.id} checkpoints</span>
+          <span className="block text-xs text-slate-400">
             {route.checkpoints.length} weather checks · {flagged} above low
           </span>
         </span>
-        <ChevronDown className={`h-4 w-4 text-slate-400 transition ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-4 w-4 text-slate-500 transition ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="border-t border-slate-100">
+        <div className="border-t border-white/[0.06]">
           <div className="px-4 py-2">
             <Segmented<Filter>
               label="Checkpoint filter"
@@ -55,7 +55,7 @@ export function CheckpointTable() {
           </div>
           <div className="scrollbar-thin max-h-80 overflow-auto">
             <table className="w-full whitespace-nowrap text-xs">
-              <thead className="sticky top-0 z-10 bg-slate-50 text-left text-[10px] uppercase tracking-wide text-slate-500">
+              <thead className="sticky top-0 z-10 bg-ink-850/95 text-left text-[10px] uppercase tracking-[0.08em] text-slate-500 backdrop-blur">
                 <tr>
                   <th className="px-4 py-2 font-semibold">Mile</th>
                   <th className="px-2 py-2 font-semibold">ETA</th>
@@ -75,12 +75,12 @@ export function CheckpointTable() {
                     onFocus={() => focusCheckpoint(index)}
                     onClick={() => openPopup(index)}
                     onKeyDown={(e) => e.key === "Enter" && openPopup(index)}
-                    className={`cursor-pointer border-t border-slate-100 tabular-nums outline-none transition ${
-                      focused === index ? "bg-brand-50" : "hover:bg-slate-50"
+                    className={`cursor-pointer border-t border-white/[0.05] tabular-nums text-slate-300 outline-none transition ${
+                      focused === index ? "bg-sky-400/10" : "hover:bg-white/[0.03]"
                     }`}
                   >
-                    <td className="px-4 py-2 font-medium text-slate-800">{Math.round(cp.mile)}</td>
-                    <td className="px-2 py-2 text-slate-600">{formatTime(cp.eta_unix)}</td>
+                    <td className="px-4 py-2 font-medium text-white">{Math.round(cp.mile)}</td>
+                    <td className="px-2 py-2 text-slate-400">{formatTime(cp.eta_unix)}</td>
                     <td className="px-2 py-2 text-right">{Math.round(cp.weather.wind_mph)} mph</td>
                     <td className="px-2 py-2 text-right">{cp.weather.rain_in_hr.toFixed(2)}″</td>
                     <td className="px-2 py-2 text-right">{cp.weather.snow_in_hr.toFixed(2)}″</td>

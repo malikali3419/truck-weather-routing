@@ -2,12 +2,13 @@ import type { RiskLevel } from "../api/types";
 
 export const LEVELS: RiskLevel[] = ["LOW", "MODERATE", "HIGH", "SEVERE", "NO_TRAVEL"];
 
+// Bright enough to read on the dark map and panels.
 export const RISK_COLOR: Record<RiskLevel, string> = {
-  LOW: "#16a34a",
-  MODERATE: "#eab308",
-  HIGH: "#f97316",
-  SEVERE: "#dc2626",
-  NO_TRAVEL: "#7e22ce",
+  LOW: "#34d399",
+  MODERATE: "#facc15",
+  HIGH: "#fb923c",
+  SEVERE: "#f43f5e",
+  NO_TRAVEL: "#c084fc",
 };
 
 export const RISK_LABEL: Record<RiskLevel, string> = {

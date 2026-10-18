@@ -7,19 +7,19 @@ export default {
         sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
       },
       colors: {
-        brand: {
-          50: "#eef2ff",
-          100: "#e0e7ff",
-          200: "#c7d2fe",
-          500: "#6366f1",
-          600: "#4f46e5",
-          700: "#4338ca",
-          900: "#1e1b4b",
+        // Deep navy surfaces
+        ink: {
+          950: "#060a13",
+          900: "#0a101d",
+          850: "#0d1424",
+          800: "#111a2e",
+          700: "#1a2540",
         },
       },
       boxShadow: {
-        card: "0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.06)",
-        float: "0 12px 32px -8px rgb(15 23 42 / 0.22), 0 4px 8px -4px rgb(15 23 42 / 0.08)",
+        glass: "0 10px 40px -12px rgb(0 0 0 / 0.65), inset 0 1px 0 rgb(255 255 255 / 0.04)",
+        glow: "0 8px 28px -8px rgb(56 189 248 / 0.55)",
+        "glow-emerald": "0 8px 28px -10px rgb(52 211 153 / 0.45)",
       },
       keyframes: {
         shimmer: { "100%": { transform: "translateX(100%)" } },

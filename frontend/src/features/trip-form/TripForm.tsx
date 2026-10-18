@@ -93,7 +93,7 @@ export function TripForm() {
   return (
     <form onSubmit={submit} className="space-y-4" noValidate aria-label="Plan a trip">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-slate-900">Plan a trip</h2>
+        <h2 className="text-sm font-semibold text-white">Plan a trip</h2>
         {hasPlan && (
           <button type="button" className="btn-ghost" onClick={() => setFormOpen(false)}>
             Cancel
@@ -109,34 +109,34 @@ export function TripForm() {
             placeholder="Origin city or address"
             value={origin}
             onChange={setOrigin}
-            icon={<span className="block h-2.5 w-2.5 rounded-full border-[2.5px] border-slate-800" />}
+            icon={<span className="block h-2.5 w-2.5 rounded-full border-[2.5px] border-slate-200" />}
           />
           <PlaceInput
             label="Destination"
             placeholder="Destination city or address"
             value={destination}
             onChange={setDestination}
-            icon={<MapPin className="h-4 w-4 text-brand-600" />}
+            icon={<MapPin className="h-4 w-4 text-sky-400" />}
           />
           <button
             type="button"
             onClick={swap}
             aria-label="Swap origin and destination"
             title="Swap origin and destination"
-            className="absolute right-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:text-brand-600"
+            className="absolute right-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-ink-800 text-slate-400 shadow-lg transition hover:border-sky-400/40 hover:text-sky-300"
           >
             <ArrowUpDown className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-[1fr_8.5rem] gap-3">
+      <div className="grid grid-cols-[minmax(0,1fr)_7.5rem] gap-3">
         <div>
           <label htmlFor="departure" className="field-label">
             Departure
           </label>
           <div className="relative">
-            <CalendarClock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <CalendarClock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
             <input
               id="departure"
               type="datetime-local"
@@ -151,7 +151,7 @@ export function TripForm() {
             Load weight
           </label>
           <div className="relative">
-            <Weight className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Weight className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
             <input
               id="load"
               type="number"
@@ -159,11 +159,11 @@ export function TripForm() {
               min={0}
               max={80000}
               step={500}
-              className="field pl-8 pr-7 tabular-nums"
+              className="field min-w-0 pl-8 pr-7 tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               value={load}
               onChange={(e) => setLoad(e.target.value)}
             />
-            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">lb</span>
+            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-500">lb</span>
           </div>
         </div>
       </div>
@@ -173,12 +173,12 @@ export function TripForm() {
         <Segmented label="Check weather every" options={INTERVAL_OPTIONS} value={interval} onChange={setSampleInterval} />
       </div>
 
-      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 px-3 py-2.5 transition hover:border-amber-300 hover:bg-amber-50/40">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2.5 transition hover:border-amber-400/30 hover:bg-amber-400/[0.04]">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-400/15 text-amber-300 ring-1 ring-inset ring-amber-400/20">
           <CloudLightning className="h-4 w-4" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-sm font-medium text-slate-800">Simulate a storm</span>
+          <span className="block text-sm font-medium text-slate-100">Simulate a storm</span>
           <span className="block text-xs text-slate-500">Demo: add a storm on the fastest route</span>
         </span>
         <input
@@ -190,12 +190,12 @@ export function TripForm() {
         />
         <span
           aria-hidden
-          className="relative h-5 w-9 shrink-0 rounded-full bg-slate-200 transition after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition peer-checked:bg-amber-500 peer-checked:after:translate-x-4 peer-focus-visible:ring-4 peer-focus-visible:ring-amber-500/20"
+          className="relative h-5 w-9 shrink-0 rounded-full bg-white/10 transition after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition peer-checked:bg-amber-400 peer-checked:shadow-[0_0_12px_rgba(251,191,36,0.5)] peer-checked:after:translate-x-4 peer-focus-visible:ring-4 peer-focus-visible:ring-amber-500/20"
         />
       </label>
 
       {error && (
-        <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="rounded-xl border border-rose-500/25 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
           {error}
         </p>
       )}
@@ -206,7 +206,7 @@ export function TripForm() {
       </button>
 
       {!hasPlan && (
-        <div className="border-t border-slate-100 pt-3">
+        <div className="border-t border-white/[0.06] pt-3">
           <p className="mb-2 text-xs text-slate-500">Or try a sample trip</p>
           <div className="flex flex-wrap gap-1.5">
             {SAMPLE_TRIPS.map((trip) => (
@@ -215,7 +215,7 @@ export function TripForm() {
                 type="button"
                 onClick={() => loadSample(trip)}
                 disabled={planning}
-                className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 disabled:opacity-50"
+                className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs font-medium text-slate-300 transition hover:border-sky-400/40 hover:bg-sky-400/10 hover:text-sky-200 disabled:opacity-50"
               >
                 {trip.name}
               </button>

@@ -12,7 +12,7 @@ const CALM = "#38bdf8";
 export const HEAT_STYLES: Record<HeatLayer, { color: unknown; opacity: unknown }> = {
   risk: {
     color: ["match", ["get", "v"], 0, RISK_COLOR.LOW, 1, RISK_COLOR.MODERATE, 2, RISK_COLOR.HIGH, 3, RISK_COLOR.SEVERE, RISK_COLOR.NO_TRAVEL],
-    opacity: ["case", ["==", ["get", "v"], 0], 0.12, 0.55],
+    opacity: ["case", ["==", ["get", "v"], 0], 0.07, 0.5],
   },
   wind: {
     color: ["step", ["get", "v"], CALM, 25, RISK_COLOR.MODERATE, 35, RISK_COLOR.HIGH, 45, RISK_COLOR.SEVERE, 55, RISK_COLOR.NO_TRAVEL],
@@ -56,7 +56,7 @@ export function HeatmapLayer({ beforeId }: { beforeId?: string }) {
   // spacing is stretched ~1.3x by Web Mercator at US latitudes, so circles
   // must be a bit larger than half a cell for neighbours to blend.
   const step = data?.grid_step_deg ?? 0.25;
-  const r0 = ((step * 512) / 360) * 1.3;
+  const r0 = ((step * 512) / 360) * 1.6;
   const style = HEAT_STYLES[layer ?? "risk"];
 
   return (

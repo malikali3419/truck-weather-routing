@@ -46,8 +46,8 @@ export function RiskProfileStrip() {
 
   return (
     <div>
-      <div className="mb-1.5 flex items-baseline justify-between text-[11px] text-slate-500">
-        <span className="font-semibold text-slate-700">Route {route.id} along the way</span>
+      <div className="mb-1.5 flex items-baseline justify-between text-[11px] text-slate-400">
+        <span className="font-semibold text-slate-200">Route {route.id} along the way</span>
         {cp ? (
           <span>
             Mile {Math.round(cp.mile)} · {formatTime(cp.eta_unix)} ·{" "}
@@ -61,7 +61,7 @@ export function RiskProfileStrip() {
       </div>
       <div
         ref={bar}
-        className="relative h-3 cursor-crosshair rounded-full bg-slate-100"
+        className="relative h-3 cursor-crosshair rounded-full bg-white/[0.06]"
         data-testid="risk-strip"
         onMouseMove={(e) => focusCheckpoint(nearest(e))}
         onMouseLeave={() => focusCheckpoint(null)}
@@ -70,7 +70,7 @@ export function RiskProfileStrip() {
         {route.segments.map((s) => (
           <div
             key={s.from_mi}
-            className="absolute inset-y-0 first:rounded-l-full last:rounded-r-full"
+            className="absolute inset-y-0 first:rounded-l-full"
             style={{
               left: `${(s.from_mi / total) * 100}%`,
               width: `${((s.to_mi - s.from_mi) / total) * 100 + 0.05}%`,
@@ -79,15 +79,15 @@ export function RiskProfileStrip() {
           />
         ))}
         {cp && (
-          <div className="absolute -inset-y-1 w-0.5 rounded bg-slate-900" style={{ left: `${(cp.mile / total) * 100}%` }} />
+          <div className="absolute -inset-y-1 w-0.5 rounded bg-white" style={{ left: `${(cp.mile / total) * 100}%` }} />
         )}
         <div
-          className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-brand-600 shadow-float"
+          className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-indigo-500 shadow-[0_0_0_4px_rgba(99,102,241,0.3),0_4px_12px_rgba(0,0,0,0.6)]"
           style={{ left: `${(truckMile / total) * 100}%` }}
           title="Truck position at slider time"
         />
       </div>
-      <div className="mt-1 flex justify-between text-[10px] tabular-nums text-slate-400">
+      <div className="mt-1 flex justify-between text-[10px] tabular-nums text-slate-500">
         <span>0 mi</span>
         <span>{Math.round(total / 2)} mi</span>
         <span>{Math.round(total)} mi</span>

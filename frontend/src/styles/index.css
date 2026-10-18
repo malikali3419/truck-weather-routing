@@ -5,40 +5,56 @@
 @layer base {
   html {
     font-feature-settings: "cv11", "ss01";
+    color-scheme: dark;
   }
   body {
-    @apply bg-slate-100 text-slate-900 antialiased;
+    @apply bg-ink-950 text-slate-200 antialiased;
   }
 }
 
 @layer components {
+  /* Frosted-glass panel */
   .card {
-    @apply rounded-2xl border border-slate-200/80 bg-white shadow-card;
+    @apply rounded-2xl border border-white/[0.07] bg-white/[0.035] shadow-glass backdrop-blur-xl;
   }
   .field-label {
-    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500;
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500;
   }
   .field {
-    @apply h-10 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/10;
+    @apply h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 hover:border-white/20 focus:border-sky-400/60 focus:bg-white/[0.06] focus:ring-4 focus:ring-sky-400/15;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/30 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500 px-4 text-sm font-semibold text-white shadow-glow transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-400/30 disabled:cursor-not-allowed disabled:opacity-60;
   }
   .btn-ghost {
-    @apply inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900;
+    @apply inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-slate-400 transition hover:bg-white/[0.06] hover:text-white;
   }
   .stat-label {
-    @apply text-[10px] font-semibold uppercase tracking-wide text-slate-400;
+    @apply text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500;
+  }
+  .text-gradient {
+    @apply bg-gradient-to-r from-sky-300 to-indigo-300 bg-clip-text text-transparent;
   }
 }
 
-/* Forecast slider: filled track up to the thumb (--p is set inline). */
+/* Soft colour glows behind the sidebar content */
+.aurora {
+  background:
+    radial-gradient(600px 300px at -10% -10%, rgb(56 189 248 / 0.12), transparent 60%),
+    radial-gradient(500px 400px at 110% 30%, rgb(99 102 241 / 0.1), transparent 60%),
+    radial-gradient(500px 300px at 30% 110%, rgb(16 185 129 / 0.06), transparent 60%),
+    #070b16;
+}
+
+/* Forecast slider: gradient fill up to the thumb (--p is set inline). */
 .timeline-range {
   -webkit-appearance: none;
   appearance: none;
   height: 6px;
   border-radius: 999px;
-  background: linear-gradient(to right, #4f46e5 var(--p), #e2e8f0 var(--p));
+  background:
+    linear-gradient(to right, #38bdf8, #6366f1) 0 / var(--p) 100% no-repeat,
+    rgb(255 255 255 / 0.1);
   outline: none;
   cursor: pointer;
 }
@@ -48,56 +64,95 @@
   height: 18px;
   border-radius: 50%;
   background: #fff;
-  border: 3px solid #4f46e5;
-  box-shadow: 0 2px 6px rgb(15 23 42 / 0.25);
+  border: 3px solid #6366f1;
+  box-shadow: 0 0 0 4px rgb(99 102 241 / 0.25), 0 4px 12px rgb(0 0 0 / 0.5);
   transition: transform 0.12s;
 }
 .timeline-range::-webkit-slider-thumb:hover {
-  transform: scale(1.12);
+  transform: scale(1.15);
 }
 .timeline-range::-moz-range-thumb {
   width: 14px;
   height: 14px;
   border-radius: 50%;
   background: #fff;
-  border: 3px solid #4f46e5;
-  box-shadow: 0 2px 6px rgb(15 23 42 / 0.25);
+  border: 3px solid #6366f1;
+  box-shadow: 0 0 0 4px rgb(99 102 241 / 0.25);
 }
 .timeline-range:focus-visible {
-  box-shadow: 0 0 0 4px rgb(99 102 241 / 0.2);
+  box-shadow: 0 0 0 4px rgb(56 189 248 / 0.25);
 }
 
-/* Map popups and controls */
+/* Map popups */
 .maplibregl-popup {
   z-index: 10;
 }
 .maplibregl-popup-content {
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 14px 16px;
-  box-shadow: 0 16px 40px -8px rgb(15 23 42 / 0.28);
+  background: rgb(13 20 36 / 0.96);
+  border: 1px solid rgb(255 255 255 / 0.09);
+  box-shadow: 0 20px 50px -10px rgb(0 0 0 / 0.7);
+  backdrop-filter: blur(16px);
   font-family: inherit;
+  color: #e2e8f0;
+}
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: rgb(13 20 36 / 0.96);
+}
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: rgb(13 20 36 / 0.96);
 }
 .maplibregl-popup-close-button {
   font-size: 18px;
   padding: 4px 10px;
-  color: #94a3b8;
-  border-radius: 0 14px 0 8px;
+  color: #64748b;
+  border-radius: 0 16px 0 8px;
 }
 .maplibregl-popup-close-button:hover {
-  background: #f1f5f9;
-  color: #0f172a;
+  background: rgb(255 255 255 / 0.06);
+  color: #fff;
 }
+
+/* Map controls in the dark theme */
 .maplibregl-ctrl-group {
+  background: rgb(13 20 36 / 0.9) !important;
+  border: 1px solid rgb(255 255 255 / 0.08);
   border-radius: 12px !important;
-  box-shadow: 0 4px 12px rgb(15 23 42 / 0.12) !important;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.5) !important;
   overflow: hidden;
+}
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid rgb(255 255 255 / 0.08) !important;
+}
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(0.85);
+}
+.maplibregl-ctrl-group button:hover {
+  background: rgb(255 255 255 / 0.06) !important;
 }
 .maplibregl-ctrl-scale {
   border-radius: 6px;
-  background: rgb(255 255 255 / 0.85);
+  background: rgb(13 20 36 / 0.8);
+  border-color: rgb(148 163 184 / 0.6);
+  color: #94a3b8;
+}
+.maplibregl-ctrl-attrib {
+  background: rgb(13 20 36 / 0.75) !important;
+  color: #94a3b8;
+  border-radius: 10px !important;
+}
+.maplibregl-ctrl-attrib-inner {
+  color: #94a3b8;
+}
+.maplibregl-ctrl-attrib a {
+  color: #cbd5e1 !important;
+}
+.maplibregl-ctrl-attrib-button {
+  filter: invert(1);
 }
 
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: rgb(255 255 255 / 0.12) transparent;
 }

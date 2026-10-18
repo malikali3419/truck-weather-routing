@@ -23,8 +23,10 @@ export function TruckMarkers() {
           <Marker key={route.id} longitude={lon} latitude={lat} anchor="center" style={{ zIndex: selected ? 3 : 2 }}>
             <div
               title={`Route ${route.id} truck${arrived ? " (arrived)" : ""}`}
-              className={`flex items-center gap-1 rounded-full border-2 border-white px-1.5 py-0.5 text-[10px] font-bold shadow-float transition-transform ${
-                selected ? "scale-110 bg-slate-900 text-white" : "bg-white text-slate-600 opacity-90"
+              className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold transition-transform ${
+                selected
+                  ? "scale-110 bg-white text-ink-950 shadow-[0_0_0_3px_rgba(56,189,248,0.5),0_6px_16px_rgba(0,0,0,0.6)]"
+                  : "bg-ink-800 text-slate-300 ring-1 ring-white/15"
               }`}
             >
               <TruckIcon />
@@ -51,12 +53,12 @@ export function EndpointMarkers() {
   return (
     <>
       <Marker longitude={ends.start[0]} latitude={ends.start[1]} anchor="center">
-        <span title={request.origin.label} className="block h-4 w-4 rounded-full border-[3px] border-white bg-slate-900 shadow-float ring-4 ring-slate-900/15" />
+        <span title={request.origin.label} className="block h-4 w-4 rounded-full border-[3px] border-ink-950 bg-white shadow-[0_0_0_4px_rgba(255,255,255,0.15)]" />
       </Marker>
       <Marker longitude={ends.end[0]} latitude={ends.end[1]} anchor="bottom">
         <svg width="22" height="28" viewBox="0 0 22 28" aria-label={request.destination.label}>
-          <path d="M11 27s9-9.2 9-16a9 9 0 1 0-18 0c0 6.8 9 16 9 16z" fill="#4f46e5" stroke="#fff" strokeWidth="2" />
-          <circle cx="11" cy="11" r="3.5" fill="#fff" />
+          <path d="M11 27s9-9.2 9-16a9 9 0 1 0-18 0c0 6.8 9 16 9 16z" fill="#38bdf8" stroke="#060a13" strokeWidth="2" />
+          <circle cx="11" cy="11" r="3.5" fill="#060a13" />
         </svg>
       </Marker>
     </>

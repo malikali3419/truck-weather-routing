@@ -91,28 +91,28 @@ export function PlaceInput({ label, placeholder, value, onChange, icon }: Props)
           }
         }}
       />
-      {isFetching && typing && <Spinner className="absolute right-3 top-3 h-4 w-4 text-slate-400" />}
+      {isFetching && typing && <Spinner className="absolute right-3 top-3 h-4 w-4 text-sky-400" />}
       {showList && (
         <ul
           id={`${id}-list`}
           role="listbox"
           aria-label={`${label} suggestions`}
-          className="scrollbar-thin absolute z-30 mt-1.5 max-h-64 w-full overflow-auto rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-float"
+          className="scrollbar-thin absolute z-30 mt-1.5 max-h-64 w-full overflow-auto rounded-xl border border-white/10 bg-ink-850/95 p-1 text-sm shadow-glass backdrop-blur-xl"
         >
-          {results.length === 0 && <li className="px-3 py-2 text-slate-500">No matches</li>}
+          {results.length === 0 && <li className="px-3 py-2 text-slate-400">No matches</li>}
           {results.map((place, i) => (
             <li
               key={`${place.label}-${i}`}
               role="option"
               aria-selected={i === active}
-              className={`flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 ${i === active ? "bg-brand-50 text-brand-900" : "text-slate-700"}`}
+              className={`flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 ${i === active ? "bg-sky-400/10 text-white" : "text-slate-300"}`}
               onMouseEnter={() => setActive(i)}
               onMouseDown={(e) => {
                 e.preventDefault();
                 choose(place);
               }}
             >
-              <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-500" />
               <span className="truncate">{place.label}</span>
             </li>
           ))}
