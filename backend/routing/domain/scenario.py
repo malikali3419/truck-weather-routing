@@ -4,6 +4,11 @@ Used only when the user turns on "Simulate a storm" — handy for demos when
 the real weather along a route is calm. The storm is a moving cell whose
 strength falls off with distance from its center and with time from its
 peak.
+
+Its peak wind sits in the 45–54 mph band on purpose: there the load rules
+decide the outcome (No Travel above 30,000 lb, Severe otherwise), so the
+demo shows how load weight changes whether a truck may travel. Real weather
+is never made calmer: the storm only raises values.
 """
 
 from __future__ import annotations
@@ -28,9 +33,9 @@ class Storm:
     half_life_h: float = 6.0
     drift_mph: float = 15.0
     drift_bearing_deg: float = 70.0
-    wind_add_mph: float = 48.0
-    rain_in_hr: float = 0.75
-    snow_in_hr: float = 2.5
+    peak_wind_mph: float = 50.0
+    rain_in_hr: float = 0.45
+    snow_in_hr: float = 1.5
 
     def center_at(self, t: float) -> tuple[float, float]:
         hours = (t - self.peak_unix) / 3600
@@ -57,10 +62,12 @@ class Storm:
             precip = {"snow_in_hr": round(w.snow_in_hr + self.snow_in_hr * k, 3)}
         else:
             precip = {"rain_in_hr": round(w.rain_in_hr + self.rain_in_hr * k, 3)}
+        # sqrt widens the windy ring: 50 mph at the center, 35 mph at k≈0.5.
+        storm_wind = self.peak_wind_mph * math.sqrt(k)
         return replace(
             w,
-            wind_mph=round(w.wind_mph + self.wind_add_mph * k, 1),
-            gust_mph=round(w.gust_mph + self.wind_add_mph * 1.3 * k, 1),
+            wind_mph=round(max(w.wind_mph, storm_wind), 1),
+            gust_mph=round(max(w.gust_mph, storm_wind * 1.3), 1),
             **precip,
         )
 

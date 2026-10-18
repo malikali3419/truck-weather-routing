@@ -148,6 +148,12 @@ def test_simulated_storm_hits_fastest_route_and_changes_recommendation(client):
     assert fastest["summary"]["max_level"] in ("SEVERE", "NO_TRAVEL")
     assert stormy["recommendation"]["route_id"] != "A"
 
+    light = client.post(
+        "/api/plan", plan_body(simulate_storm=True, load_weight_lb=20000), format="json"
+    ).json()
+    assert stormy["routes"][0]["summary"]["has_no_travel"]
+    assert not light["routes"][0]["summary"]["has_no_travel"]  # light truck may travel
+
     body = {
         "routes": [r["geometry"] for r in stormy["routes"]],
         "departure_at": timezone.now().isoformat(),

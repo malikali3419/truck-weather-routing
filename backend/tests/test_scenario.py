@@ -31,9 +31,25 @@ def test_rain_when_warm_snow_when_freezing():
     storm = Storm(lat=40.0, lon=-100.0, peak_unix=T, drift_mph=0)
     warm = storm.apply(weather(wind=5, temp=60), 40.0, -100.0, T)
     cold = storm.apply(weather(wind=5, temp=20), 40.0, -100.0, T)
-    assert warm.wind_mph == pytest.approx(53)
-    assert warm.rain_in_hr > 0.5 and warm.snow_in_hr == 0
-    assert cold.snow_in_hr > 2 and cold.rain_in_hr == 0
+    assert warm.wind_mph == pytest.approx(50)
+    assert warm.rain_in_hr > 0.4 and warm.snow_in_hr == 0
+    assert cold.snow_in_hr > 1.4 and cold.rain_in_hr == 0
+
+
+def test_never_calms_real_weather():
+    storm = Storm(lat=40.0, lon=-100.0, peak_unix=T, drift_mph=0)
+    assert storm.apply(weather(wind=58), 40.0, -100.0, T).wind_mph == 58
+
+
+def test_peak_wind_is_where_load_decides():
+    """45–54 mph: No Travel above 30,000 lb, merely Severe for lighter loads."""
+    from routing.domain.models import RiskLevel
+    from routing.domain.risk import classify
+
+    storm = Storm(lat=40.0, lon=-100.0, peak_unix=T, drift_mph=0)
+    core = storm.apply(weather(wind=5), 40.0, -100.0, T)
+    assert classify(core, 42_000).level == RiskLevel.NO_TRAVEL
+    assert classify(core, 20_000).level == RiskLevel.SEVERE
 
 
 def test_round_trips_through_dict():

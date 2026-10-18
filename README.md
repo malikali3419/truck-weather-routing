@@ -85,7 +85,7 @@ If openrouteservice times out or is down, the trip falls back to the public OSRM
 
 ## Simulated storm (demo only)
 
-Real weather is often calm. The "Simulate a storm (demo)" checkbox adds a moving storm cell on top of the real forecast. It is placed on the fastest route at the moment the truck would reach it, so you can see risk, the recommendation and the heatmap react. It is off by default, and the map shows a "Simulated storm active, not real weather" label whenever it is on.
+Real weather is often calm. The "Simulate a storm (demo)" checkbox adds a moving storm cell on top of the real forecast. It is placed on the fastest route at the moment the truck would reach it, so you can see risk, the recommendation and the heatmap react. Its peak wind is about 50 mph, inside the 45–54 mph band where the load rules decide: above 30,000 lb that stretch is No Travel, at or below 30,000 lb it is Severe but allowed. The storm only raises values; it never makes the real forecast calmer. It is off by default, and the map shows a "Simulated storm active, not real weather" label whenever it is on.
 
 ## Run locally
 
