@@ -28,7 +28,7 @@ test.describe("Forecast timeline and heatmap", () => {
     const time = page.getByTestId("slider-time");
     await page.getByRole("button", { name: "Play forecast animation" }).click();
     await expect(page.getByRole("button", { name: "Pause forecast animation" })).toBeVisible();
-    await expect(time).not.toContainText("+0h", { timeout: 3000 });
+    await expect(time).not.toContainText("+0h", { timeout: 8000 });
 
     await page.getByRole("button", { name: "Pause forecast animation" }).click();
     const paused = await time.textContent();

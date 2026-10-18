@@ -42,8 +42,10 @@ export function ForecastPanel() {
     let frame = 0;
     let last = performance.now();
     const tick = (now: number) => {
-      // rAF timestamps can be slightly earlier than performance.now(), so never step backwards.
-      const dt = Math.min(Math.max((now - last) / 1000, 0), 0.1);
+      // rAF timestamps can be slightly earlier than performance.now(), so never step
+      // backwards. The upper cap avoids a big jump after a background tab resumes,
+      // while still playing at full speed on slow devices with few frames.
+      const dt = Math.min(Math.max((now - last) / 1000, 0), 0.5);
       last = now;
       const next = useTripStore.getState().hour + dt * PLAY_SPEED;
       if (next >= MAX_HOUR) {
