@@ -3,7 +3,6 @@
 A React + Django app that helps a truck driver choose the safest route. It compares three truck routes by forecast weather at the time the truck reaches each checkpoint, applies the load-weight rules, and recommends the best balance of risk and travel time.
 
 - **Live app:** https://truck-weather-routing-nu.vercel.app
-- **Walkthrough:** _add your Loom URL_
 
 ## What it does
 
