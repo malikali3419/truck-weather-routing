@@ -128,7 +128,13 @@ CI (`.github/workflows/ci.yml`) runs lint, the backend tests, the frontend build
 
 The `Dockerfile` builds the React app and serves it from Django with WhiteNoise, so the app runs as one service on one URL with no CORS setup.
 
-On **Render**: New → Blueprint → pick this repo (it reads `render.yaml`) → set `ORS_API_KEY`. Free Render services sleep after 15 minutes idle; an UptimeRobot monitor on `/api/health` every 5 minutes keeps it awake.
+**Hugging Face Spaces** (free, no card):
+
+1. Create a Space at https://huggingface.co/new-space and choose **Docker** → **Blank**.
+2. Under the Space's **Settings → Variables and secrets**, add the secrets `ORS_API_KEY` and `DJANGO_SECRET_KEY` (any long random string) and the variable `ALLOWED_HOSTS=.hf.space`.
+3. Run `scripts/deploy-hf.sh https://huggingface.co/spaces/<user>/<space>`. When asked for a password, use a Hugging Face access token with write permission.
+
+**Render** works too (`render.yaml` is included: New → Blueprint → set `ORS_API_KEY`), but new accounts must add a card.
 
 ## Limitations and next steps
 
