@@ -130,8 +130,8 @@ export function TripForm() {
         </div>
       </div>
 
-      <div className="grid grid-cols-5 gap-3">
-        <div className="col-span-3">
+      <div className="grid grid-cols-[1fr_8.5rem] gap-3">
+        <div>
           <label htmlFor="departure" className="field-label">
             Departure
           </label>
@@ -146,12 +146,12 @@ export function TripForm() {
             />
           </div>
         </div>
-        <div className="col-span-2">
+        <div>
           <label htmlFor="load" className="field-label">
             Load weight
           </label>
           <div className="relative">
-            <Weight className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Weight className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               id="load"
               type="number"
@@ -159,11 +159,11 @@ export function TripForm() {
               min={0}
               max={80000}
               step={500}
-              className="field pl-9 pr-8"
+              className="field pl-8 pr-7 tabular-nums"
               value={load}
               onChange={(e) => setLoad(e.target.value)}
             />
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">lb</span>
+            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">lb</span>
           </div>
         </div>
       </div>

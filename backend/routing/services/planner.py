@@ -20,7 +20,7 @@ from routing.providers.alternatives import generate_routes
 from routing.providers.base import RoutingProvider, WeatherProvider
 from routing.providers.open_meteo import snap
 
-WEATHER_SNAP_DEG = 0.05  # ~5 km; finer than most forecast model grids
+WEATHER_SNAP_DEG = 0.1  # ~11 km; finer than the 10-mile checkpoint spacing
 SIMPLIFY_TOLERANCE_DEG = 0.0003  # ~30 m
 ROUTE_CACHE_TTL_S = 6 * 3600
 STORM_POSITION = 0.55  # share of the fastest route where a simulated storm peaks

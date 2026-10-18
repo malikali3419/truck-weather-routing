@@ -17,7 +17,7 @@ from routing.providers.base import WeatherProvider
 
 HOURS = 48
 CORRIDOR_RADIUS_MI = 40
-MAX_POINTS = 360
+MAX_POINTS = 220  # keeps one plan well inside the free 5,000-locations-per-hour weather quota
 GRID_STEPS_DEG = (0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1.0)
 MILES_PER_DEG_LAT = 69.0
 

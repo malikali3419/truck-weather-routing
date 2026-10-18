@@ -11,6 +11,7 @@ from routing.api import providers
 from routing.domain.geo import cumulative_miles, destination_point, encode_polyline
 from routing.domain.models import RawRoute
 from routing.providers import alternatives
+from routing.services import heatmap
 
 from .factories import flat_series
 
@@ -124,7 +125,7 @@ def test_heatmap_frames(client):
     assert res.status_code == 200
     data = res.json()
     n = len(data["points"])
-    assert 0 < n <= 360
+    assert 0 < n <= heatmap.MAX_POINTS
     assert len(data["times_unix"]) == 49
     assert len(data["layers"]["risk"]) == 49
     assert all(len(frame) == n for frame in data["layers"]["risk"])

@@ -23,7 +23,7 @@ HOURLY_VARS = (
 )
 CHUNK = 100
 FORECAST_DAYS = 10
-CACHE_TTL_S = 30 * 60
+CACHE_TTL_S = 60 * 60
 
 
 class OpenMeteoClient:
