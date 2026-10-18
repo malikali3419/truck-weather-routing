@@ -7,6 +7,8 @@ from functools import cache
 from django.conf import settings
 
 from routing.providers.fallback import FallbackRouting
+from routing.providers.fallback_weather import FallbackWeather
+from routing.providers.met_norway import MetNorwayClient
 from routing.providers.open_meteo import OpenMeteoClient
 from routing.providers.ors import OrsClient
 from routing.providers.osrm import OsrmClient
@@ -28,5 +30,15 @@ def routing() -> FallbackRouting:
 
 
 @cache
-def weather() -> OpenMeteoClient:
+def open_meteo() -> OpenMeteoClient:
     return OpenMeteoClient()
+
+
+@cache
+def met_norway() -> MetNorwayClient:
+    return MetNorwayClient()
+
+
+def weather() -> FallbackWeather:
+    """A fresh fallback wrapper per request (it records which source answered)."""
+    return FallbackWeather(open_meteo(), met_norway(), "open-meteo", "met-norway")

@@ -76,6 +76,7 @@ export interface PlanResponse {
   /** Set only when the user asked for a simulated storm. */
   scenario: StormScenario | null;
   routing_source: "openrouteservice" | "osrm";
+  weather_source: "open-meteo" | "met-norway";
   routes: PlannedRoute[];
   recommendation: Recommendation;
 }

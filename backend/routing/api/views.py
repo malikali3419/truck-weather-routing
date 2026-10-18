@@ -52,7 +52,8 @@ class PlanView(APIView):
             simulate_storm=d["simulate_storm"],
         )
         try:
-            return Response(plan_trip(req, providers.routing(), providers.weather()))
+            weather = providers.weather()
+            return Response(plan_trip(req, providers.routing(), weather))
         except ProviderError as exc:
             return _provider_error(exc)
 
@@ -63,13 +64,14 @@ class HeatmapView(APIView):
         s.is_valid(raise_exception=True)
         d = s.validated_data
         try:
+            weather = providers.weather()
             data = build_heatmap(
                 d["routes"],
                 d["departure_at"].timestamp(),
                 d["load_weight_lb"],
-                providers.weather(),
+                weather,
                 storm=Storm.from_dict(d["scenario"]) if d.get("scenario") else None,
             )
         except ProviderError as exc:
             return _provider_error(exc)
-        return Response(data)
+        return Response({**data, "weather_source": getattr(weather, "source", "open-meteo")})

@@ -13,6 +13,7 @@ export default function App() {
   const formOpen = useTripStore((s) => s.formOpen);
   const simulated = useTripStore((s) => !!s.plan?.scenario);
   const fallbackRouting = useTripStore((s) => s.plan?.routing_source === "osrm");
+  const fallbackWeather = useTripStore((s) => s.plan?.weather_source === "met-norway");
   const planning = usePlanning();
 
   return (
@@ -50,6 +51,12 @@ export default function App() {
                   travel times stretched 15% for truck speeds.
                 </p>
               )}
+              {fallbackWeather && (
+                <p className="flex gap-2 rounded-xl border border-sky-400/20 bg-sky-400/[0.08] px-3 py-2 text-xs text-sky-200">
+                  <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  The main weather service hit its hourly limit, so this forecast comes from MET Norway.
+                </p>
+              )}
               <RecommendationCard />
               <RouteList />
               <CheckpointTable />
@@ -57,7 +64,7 @@ export default function App() {
           )}
 
           <p className="px-1 pt-1 text-[11px] leading-relaxed text-slate-500">
-            Truck routing by openrouteservice · Weather by Open-Meteo · Times in your local time zone.
+            Truck routing by openrouteservice · Weather by Open-Meteo and MET Norway · Times in your local time zone.
           </p>
         </div>
       </aside>

@@ -80,7 +80,11 @@ def plan_trip(req: TripRequest, routing: RoutingProvider, weather: WeatherProvid
         planned.append(PlannedRoute(string.ascii_uppercase[idx], raw, checkpoints, score))
 
     rec = recommend([Candidate(p.id, p.score, p.raw.duration_s) for p in planned])
-    return {**_serialize(planned, rec, depart_ts, req, storm), "routing_source": source}
+    return {
+        **_serialize(planned, rec, depart_ts, req, storm),
+        "routing_source": source,
+        "weather_source": getattr(weather, "source", "open-meteo"),
+    }
 
 
 def _routes(req: TripRequest, routing: RoutingProvider) -> tuple[list[RawRoute], str]:
