@@ -108,3 +108,21 @@ test("play drives the trucks along their routes", async ({ page }) => {
   const after = (await truck.boundingBox())!;
   expect(Math.hypot(after.x - paused.x, after.y - paused.y)).toBeLessThan(1);
 });
+
+test("starting playback at +0h after picking another route does not crash", async ({ page }) => {
+  await mockApi(page);
+  await page.goto("/");
+  await planSampleTrip(page);
+  await expect(page.getByText("Loading forecast grid…")).toBeHidden();
+
+  for (const id of ["B", "C", "A"]) {
+    await page.getByRole("button", { name: new RegExp(`^Route ${id},`) }).click();
+    await page.getByRole("slider", { name: "Forecast hour after departure" }).fill("0");
+    await page.getByRole("button", { name: "Play forecast animation" }).click();
+    await page.waitForTimeout(400);
+    await page.getByRole("button", { name: "Pause forecast animation" }).click();
+  }
+  // The heatmap and panel are still alive (page errors fail the test automatically).
+  await expect(page.getByRole("region", { name: "Forecast timeline" })).toBeVisible();
+  await expect(page.getByTestId("truck-A")).toBeVisible();
+});

@@ -4,11 +4,10 @@ import { useHeatmap } from "../../api/hooks";
 import type { HeatLayer } from "../../api/types";
 import { RiskLegend, Segmented, Spinner } from "../../components/ui";
 import { formatTimeLong } from "../../lib/format";
-import { useTripStore } from "../../store/useTripStore";
+import { MAX_HOUR, useTripStore } from "../../store/useTripStore";
 import { RiskProfileStrip } from "./RiskProfileStrip";
 import { useSliderTime } from "./useSliderTime";
 
-const MAX_HOUR = 48;
 // Forecast hours played per real second: the full 48 h takes 24 s.
 const PLAY_SPEED = 2;
 const LAYER_OPTIONS: { value: HeatLayer | null; label: React.ReactNode; title: string }[] = [
@@ -43,7 +42,8 @@ export function ForecastPanel() {
     let frame = 0;
     let last = performance.now();
     const tick = (now: number) => {
-      const dt = Math.min((now - last) / 1000, 0.1);
+      // rAF timestamps can be slightly earlier than performance.now(), so never step backwards.
+      const dt = Math.min(Math.max((now - last) / 1000, 0), 0.1);
       last = now;
       const next = useTripStore.getState().hour + dt * PLAY_SPEED;
       if (next >= MAX_HOUR) {

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import type { HeatLayer, PlanRequest, PlanResponse } from "../api/types";
 
+export const MAX_HOUR = 48;
+
 interface TripState {
   request: PlanRequest | null;
   plan: PlanResponse | null;
@@ -66,7 +68,8 @@ export const useTripStore = create<TripState>((set) => ({
   selectRoute: (id) => set({ selectedRouteId: id, focusedCheckpoint: null, popupCheckpoint: null }),
   focusCheckpoint: (index) => set({ focusedCheckpoint: index }),
   openPopup: (index) => set({ popupCheckpoint: index }),
-  setHour: (hour) => set({ hour }),
+  // Always within the 0–48 h forecast window, whoever sets it.
+  setHour: (hour) => set({ hour: Number.isFinite(hour) ? Math.min(MAX_HOUR, Math.max(0, hour)) : 0 }),
   setHeatLayer: (heatLayer) => set({ heatLayer }),
   setPlaying: (playing) => set({ playing }),
 }));

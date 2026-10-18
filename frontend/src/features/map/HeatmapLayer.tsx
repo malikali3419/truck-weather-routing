@@ -42,7 +42,8 @@ export function HeatmapLayer({ beforeId }: { beforeId?: string }) {
 
   const geojson = useMemo<FeatureCollection<Point>>(() => {
     if (!data || !layer) return { type: "FeatureCollection", features: [] };
-    const frame = data.layers[layer][Math.min(hour, data.times_unix.length - 1)];
+    const last = data.layers[layer].length - 1;
+    const frame = data.layers[layer][Math.min(Math.max(hour, 0), last)];
     return {
       type: "FeatureCollection",
       features: data.points.map(([lat, lon], i) => ({
