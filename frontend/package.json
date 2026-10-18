@@ -10,7 +10,7 @@
     "test": "vitest run --dir src",
     "lint": "tsc -b --noEmit",
     "e2e": "playwright test --project=ui",
-    "e2e:live": "playwright test --project=live"
+    "e2e:live": "npm run build && playwright test --project=live"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.59.0",

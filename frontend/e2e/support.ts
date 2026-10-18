@@ -82,10 +82,10 @@ export const test = base.extend<{ pageErrors: string[] }>({
 export { expect };
 
 /** Plan the Denver → Chicago sample trip and wait for results. */
-export async function planSampleTrip(page: Page, { storm = false } = {}) {
+export async function planSampleTrip(page: Page, { storm = false, timeout = 10_000 } = {}) {
   if (storm) await page.getByLabel("Simulate a storm (demo)").check({ force: true });
   await page.getByRole("button", { name: "Denver → Chicago" }).click();
-  await expect(page.getByRole("region", { name: "Route options" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Route options" })).toBeVisible({ timeout });
 }
 
 export const routeCard = (page: Page, id: string) =>
