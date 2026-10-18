@@ -40,8 +40,14 @@ def test_switches_on_rate_limit_and_skips_primary_for_a_while():
     assert primary.calls == 1  # not retried while blocked
 
 
-def test_other_errors_are_not_hidden():
+def test_timeouts_and_outages_also_use_the_backup():
     w = FallbackWeather(Stub("om", status=502), Stub("met"), "open-meteo", "met-norway")
+    assert w.hourly([(1, 2)]) == ["met"]
+    assert w.source == "met-norway"
+
+
+def test_bad_requests_are_not_hidden():
+    w = FallbackWeather(Stub("om", status=400), Stub("met"), "open-meteo", "met-norway")
     with pytest.raises(ProviderError):
         w.hourly([(1, 2)])
 

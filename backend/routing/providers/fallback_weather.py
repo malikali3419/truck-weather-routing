@@ -12,10 +12,12 @@ from .base import ProviderError, WeatherProvider
 
 log = logging.getLogger(__name__)
 
-# After a rate-limit answer, skip the primary for a while instead of
-# spending a request (and seconds) on it for every trip.
+# After a failure, skip the primary for a while instead of spending a request
+# (and seconds) on it for every trip: longer for rate limits, which last until
+# the next hour, shorter for timeouts and outages.
 BLOCKED_KEY = "weather:primary-blocked"
-BLOCKED_FOR_S = 10 * 60
+RATE_LIMITED_FOR_S = 10 * 60
+UNAVAILABLE_FOR_S = 2 * 60
 
 
 class FallbackWeather:
@@ -38,10 +40,12 @@ class FallbackWeather:
             try:
                 return self._primary.hourly(points)
             except ProviderError as exc:
-                # 503 = rate limited or busy; anything else is a real error.
-                if exc.status != 503:
+                # 5xx = rate limited, timed out or down: try the backup.
+                # Anything else means the request itself is wrong.
+                if exc.status < 500:
                     raise
-                log.warning("Primary weather limited (%s), using fallback", exc)
-                cache.set(BLOCKED_KEY, True, BLOCKED_FOR_S)
+                log.warning("Primary weather unavailable (%s), using fallback", exc)
+                blocked_for = RATE_LIMITED_FOR_S if exc.status == 503 else UNAVAILABLE_FOR_S
+                cache.set(BLOCKED_KEY, True, blocked_for)
         self.source = self._names[1]
         return self._fallback.hourly(points)
