@@ -2,7 +2,7 @@
 
 A React + Django app that helps a truck driver choose the safest route. It compares three truck routes by forecast weather at the time the truck reaches each checkpoint, applies the load-weight rules, and recommends the best balance of risk and travel time.
 
-- **Live app:** _add your hosted URL_
+- **Live app:** https://truck-weather-routing-nu.vercel.app
 - **Walkthrough:** _add your Loom URL_
 
 ## What it does
@@ -10,9 +10,9 @@ A React + Django app that helps a truck driver choose the safest route. It compa
 1. You enter origin, destination, departure time, load weight and a sampling interval (10, 25 or 50 miles).
 2. The backend gets three distinct truck routes from openrouteservice (`driving-hgv` profile, with gross weight).
 3. Each route gets a checkpoint every N miles, plus the destination. Each checkpoint's ETA comes from the router's own per-step travel times.
-4. For each checkpoint it reads the Open-Meteo hourly forecast **at that ETA**, classifies wind, rain, snow and wind-with-load, and keeps the worst level.
+4. For each checkpoint it reads the hourly forecast (Open-Meteo, with MET Norway as a backup) **at that ETA**, classifies wind, rain, snow and wind-with-load, and keeps the worst level.
 5. Each route is scored (miles per risk level, average risk), and one is recommended with plain-language reasons.
-6. The map shows every route colored by risk, the checkpoints (click for details), and a weather heatmap of the corridor with a 0–48 hour slider. Trucks on the map move to where each would be at the slider's time.
+6. The map shows all three routes (the selected one colored by risk), its checkpoints (click for details), and a weather heatmap of the corridor with a 0–48 hour slider. Press play and each route's truck drives along it, so you can see which weather it meets. Light and dark themes are available.
 
 ## Architecture
 
@@ -23,8 +23,8 @@ React (Vite, TypeScript, MapLibre)          Django + DRF
 │ RouteList, CheckpointTable  │           │ services/   planner, heatmap         │
 │ TripMap: routes, checkpoints│           │ domain/     pure logic (no I/O)      │
 │   heatmap, trucks           │           │   sampling, risk, scoring, recommend │
-│ ForecastPanel: slider, strip│           │ providers/  openrouteservice, OSRM   │
-└─────────────────────────────┘           │             fallback, Open-Meteo     │
+│ ForecastPanel: slider, strip│           │ providers/  openrouteservice + OSRM, │
+└─────────────────────────────┘           │             Open-Meteo + MET Norway  │
                                           └──────────────────────────────────────┘
 ```
 
@@ -67,18 +67,21 @@ Routes with any No Travel miles are never recommended. The rest are ranked by:
 
 Differences smaller than **1 mile** or **0.05 average risk** count as ties, so a 0.2-mile difference in Severe miles can't outweigh hours of extra driving. If every route has No Travel miles, the app recommends none and suggests delaying departure. Each recommendation lists the criterion that decided it against every other route.
 
-## Three routes, always
+## Three route options
 
 openrouteservice only computes alternatives for trips under 100 km. For longer trips the backend routes through via points pushed sideways from the middle of the main route (two rounds, increasing offsets). It keeps candidates that overlap the others by less than 80% and take no more than 1.6× the main route's time.
+
+Candidates that drive out to a side road and back the same way are rejected. In unusual geography (for example a narrow strip of land between lakes) fewer than three distinct routes may exist; the app then shows the routes it found.
 
 If openrouteservice times out or is down, the trip falls back to the public OSRM server. OSRM has no truck profile, so its car times are stretched 15%, and the UI says the fallback was used. Only the first routing call can trigger the fallback, so all three routes of a trip always come from the same engine. Routes are cached for 6 hours, so changing the interval, the departure time or the storm demo doesn't call the routing API again.
 
 ## Map and heatmap performance
 
 - Routes, checkpoints and the heatmap are MapLibre WebGL layers, not DOM markers. Only the three trucks and two endpoint pins are DOM elements.
-- The heatmap is fetched **once per plan**: up to 360 corridor grid points × 49 hours × 4 layers in one gzipped response (~15 KB). Moving the slider only swaps one number per point on the client, with no network request. The grid step adapts to trip length.
+- The heatmap is fetched **once per plan**: up to 220 corridor grid points × 49 hours × 4 layers in one gzipped response. Moving the slider only swaps one number per point on the client, with no network request. The grid step adapts to trip length.
 - Route geometry is simplified on the server (Douglas–Peucker, ~30 m) and sent as encoded polylines.
-- Weather is cached per location (rounded to 0.05°, 30 minutes), and lookups are batched, 100 locations per Open-Meteo request.
+- Weather is cached per location (rounded to 0.1°, 60 minutes), and lookups are batched, 100 locations per Open-Meteo request. A long trip uses about 470 of Open-Meteo's 5,000 free location lookups per hour.
+- If Open-Meteo returns its rate-limit error, the app switches to MET Norway (free, global, one location per request, fetched in parallel) for the next 10 minutes and tells the user. Precipitation below freezing is treated as snow, using the same 0.7 cm per mm ratio as Open-Meteo.
 
 ## Simulated storm (demo only)
 
