@@ -1,0 +1,7 @@
+.env
+**/.venv
+**/node_modules
+frontend/dist
+frontend/e2e-report
+frontend/test-results
+*.pdf

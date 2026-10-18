@@ -126,15 +126,15 @@ CI (`.github/workflows/ci.yml`) runs lint, the backend tests, the frontend build
 
 ## Deploy (free)
 
-The `Dockerfile` builds the React app and serves it from Django with WhiteNoise, so the app runs as one service on one URL with no CORS setup.
+**Vercel** (free, no card) serves the built React app as static files and runs the Django API as a Python serverless function (`api/index.py`, routed by `vercel.json`):
 
-**Hugging Face Spaces** (free, no card):
+1. Import the GitHub repo at https://vercel.com/new (framework preset: **Other**; the build settings come from `vercel.json`).
+2. Add the environment variables `ORS_API_KEY`, `DJANGO_SECRET_KEY` (any long random string) and `ALLOWED_HOSTS=.vercel.app`.
+3. Deploy. Every push to `main` redeploys automatically.
 
-1. Create a Space at https://huggingface.co/new-space and choose **Docker** → **Blank**.
-2. Under the Space's **Settings → Variables and secrets**, add the secrets `ORS_API_KEY` and `DJANGO_SECRET_KEY` (any long random string) and the variable `ALLOWED_HOSTS=.hf.space`.
-3. Run `scripts/deploy-hf.sh https://huggingface.co/spaces/<user>/<space>`. When asked for a password, use a Hugging Face access token with write permission.
+On serverless the in-memory cache only lives as long as a warm function instance, so repeat plans are cached less often than on a long-running server.
 
-**Render** works too (`render.yaml` is included: New → Blueprint → set `ORS_API_KEY`), but new accounts must add a card.
+**Docker** hosts (Render, Fly.io, Railway, …): the `Dockerfile` builds the React app and serves it from Django with WhiteNoise as a single service. `render.yaml` is included for Render (New → Blueprint → set `ORS_API_KEY`); these hosts generally ask for a card on their free tiers.
 
 ## Limitations and next steps
 
