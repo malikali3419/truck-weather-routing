@@ -11,3 +11,5 @@ dist/
 db.sqlite3
 staticfiles/
 *.tsbuildinfo
+e2e-report/
+test-results/

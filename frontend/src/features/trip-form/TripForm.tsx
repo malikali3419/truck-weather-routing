@@ -1,11 +1,17 @@
+import { ArrowUpDown, CalendarClock, CloudLightning, MapPin, Route, Weight } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { usePlanTrip } from "../../api/hooks";
+import { usePlanning, usePlanTrip } from "../../api/hooks";
 import type { Place, PlanRequest, SampleInterval } from "../../api/types";
+import { Segmented, Spinner } from "../../components/ui";
 import { nextFullHour, toLocalInput } from "../../lib/format";
 import { useTripStore } from "../../store/useTripStore";
 import { PlaceInput } from "./PlaceInput";
 
-const INTERVALS: SampleInterval[] = [10, 25, 50];
+export const INTERVAL_OPTIONS: { value: SampleInterval; label: string }[] = [
+  { value: 10, label: "10 mi" },
+  { value: 25, label: "25 mi" },
+  { value: 50, label: "50 mi" },
+];
 
 const SAMPLE_TRIPS: { name: string; origin: Place; destination: Place }[] = [
   {
@@ -34,8 +40,10 @@ export function TripForm() {
   const [simulateStorm, setSimulateStorm] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const planTrip = usePlanTrip();
+  const planning = usePlanning();
+  const planError = useTripStore((s) => s.planError);
   const hasPlan = useTripStore((s) => !!s.plan);
-  const lastRequest = useTripStore((s) => s.request);
+  const setFormOpen = useTripStore((s) => s.setFormOpen);
 
   const build = (overrides: Partial<PlanRequest> = {}): PlanRequest | null => {
     const o = overrides.origin ?? origin;
@@ -43,7 +51,7 @@ export function TripForm() {
     const weight = Number(load);
     if (!o || !d) return fail("Choose an origin and a destination from the suggestions.");
     if (!departure) return fail("Choose a departure date and time.");
-    if (!Number.isFinite(weight) || weight < 0 || weight > 80000)
+    if (load.trim() === "" || !Number.isFinite(weight) || weight < 0 || weight > 80000)
       return fail("Load weight must be between 0 and 80,000 lb.");
     setFormError(null);
     return {
@@ -68,10 +76,9 @@ export function TripForm() {
     if (req) planTrip.mutate(req);
   };
 
-  const changeInterval = (value: SampleInterval) => {
-    setSampleInterval(value);
-    // Interval only changes sampling density, so re-run the last plan right away.
-    if (hasPlan && lastRequest) planTrip.mutate({ ...lastRequest, sample_interval_mi: value });
+  const swap = () => {
+    setOrigin(destination);
+    setDestination(origin);
   };
 
   const loadSample = (trip: (typeof SAMPLE_TRIPS)[number]) => {
@@ -81,115 +88,139 @@ export function TripForm() {
     if (req) planTrip.mutate(req);
   };
 
-  const error = formError ?? (planTrip.error ? planTrip.error.message : null);
+  const error = formError ?? planError;
 
   return (
-    <form onSubmit={submit} className="space-y-3" noValidate>
-      <PlaceInput label="Origin" placeholder="City or address" value={origin} onChange={setOrigin} />
-      <PlaceInput
-        label="Destination"
-        placeholder="City or address"
-        value={destination}
-        onChange={setDestination}
-      />
+    <form onSubmit={submit} className="space-y-4" noValidate aria-label="Plan a trip">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-slate-900">Plan a trip</h2>
+        {hasPlan && (
+          <button type="button" className="btn-ghost" onClick={() => setFormOpen(false)}>
+            Cancel
+          </button>
+        )}
+      </div>
+
+      <div>
+        <span className="field-label">Route</span>
+        <div className="relative space-y-2">
+          <PlaceInput
+            label="Origin"
+            placeholder="Origin city or address"
+            value={origin}
+            onChange={setOrigin}
+            icon={<span className="block h-2.5 w-2.5 rounded-full border-[2.5px] border-slate-800" />}
+          />
+          <PlaceInput
+            label="Destination"
+            placeholder="Destination city or address"
+            value={destination}
+            onChange={setDestination}
+            icon={<MapPin className="h-4 w-4 text-brand-600" />}
+          />
+          <button
+            type="button"
+            onClick={swap}
+            aria-label="Swap origin and destination"
+            title="Swap origin and destination"
+            className="absolute right-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:text-brand-600"
+          >
+            <ArrowUpDown className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-5 gap-3">
         <div className="col-span-3">
           <label htmlFor="departure" className="field-label">
             Departure
           </label>
-          <input
-            id="departure"
-            type="datetime-local"
-            className="field"
-            value={departure}
-            onChange={(e) => setDeparture(e.target.value)}
-          />
+          <div className="relative">
+            <CalendarClock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              id="departure"
+              type="datetime-local"
+              className="field pl-9 pr-2 text-[13px]"
+              value={departure}
+              onChange={(e) => setDeparture(e.target.value)}
+            />
+          </div>
         </div>
         <div className="col-span-2">
           <label htmlFor="load" className="field-label">
-            Load weight (lb)
+            Load weight
           </label>
-          <input
-            id="load"
-            type="number"
-            inputMode="numeric"
-            min={0}
-            max={80000}
-            step={500}
-            className="field"
-            value={load}
-            onChange={(e) => setLoad(e.target.value)}
-          />
+          <div className="relative">
+            <Weight className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              id="load"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={80000}
+              step={500}
+              className="field pl-9 pr-8"
+              value={load}
+              onChange={(e) => setLoad(e.target.value)}
+            />
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">lb</span>
+          </div>
         </div>
       </div>
 
       <div>
-        <span className="field-label">Weather check every</span>
-        <div className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1" role="radiogroup">
-          {INTERVALS.map((value) => (
-            <button
-              key={value}
-              type="button"
-              role="radio"
-              aria-checked={interval === value}
-              onClick={() => changeInterval(value)}
-              className={`rounded-md py-1.5 text-sm font-medium transition ${
-                interval === value ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              {value} mi
-            </button>
-          ))}
-        </div>
+        <span className="field-label">Check weather every</span>
+        <Segmented label="Check weather every" options={INTERVAL_OPTIONS} value={interval} onChange={setSampleInterval} />
       </div>
 
-      <label className="flex cursor-pointer items-start gap-2 rounded-lg border border-dashed border-amber-300 bg-amber-50/60 px-3 py-2 text-xs text-amber-900">
+      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 px-3 py-2.5 transition hover:border-amber-300 hover:bg-amber-50/40">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+          <CloudLightning className="h-4 w-4" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-medium text-slate-800">Simulate a storm</span>
+          <span className="block text-xs text-slate-500">Demo: add a storm on the fastest route</span>
+        </span>
         <input
           type="checkbox"
-          className="mt-0.5 accent-amber-600"
+          className="peer sr-only"
           checked={simulateStorm}
           onChange={(e) => setSimulateStorm(e.target.checked)}
+          aria-label="Simulate a storm (demo)"
         />
-        <span>
-          <span className="font-semibold">Simulate a storm (demo)</span>
-          <span className="block text-amber-800/80">
-            Adds a moving storm on the fastest route, on top of the real forecast, to show how
-            risk and the recommendation react.
-          </span>
-        </span>
+        <span
+          aria-hidden
+          className="relative h-5 w-9 shrink-0 rounded-full bg-slate-200 transition after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition peer-checked:bg-amber-500 peer-checked:after:translate-x-4 peer-focus-visible:ring-4 peer-focus-visible:ring-amber-500/20"
+        />
       </label>
 
       {error && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
           {error}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={planTrip.isPending}
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
-      >
-        {planTrip.isPending && (
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-        )}
-        {planTrip.isPending ? "Checking routes and weather…" : "Plan routes"}
+      <button type="submit" disabled={planning} className="btn-primary h-11 w-full">
+        {planning ? <Spinner /> : <Route className="h-4 w-4" />}
+        {planning ? "Checking routes and weather…" : "Find the safest route"}
       </button>
 
       {!hasPlan && (
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          <span className="w-full text-xs text-slate-500">Or try a sample trip:</span>
-          {SAMPLE_TRIPS.map((trip) => (
-            <button
-              key={trip.name}
-              type="button"
-              onClick={() => loadSample(trip)}
-              disabled={planTrip.isPending}
-              className="rounded-full border border-slate-200 px-2.5 py-1 text-xs text-slate-600 hover:border-slate-400 hover:text-slate-900"
-            >
-              {trip.name}
-            </button>
-          ))}
+        <div className="border-t border-slate-100 pt-3">
+          <p className="mb-2 text-xs text-slate-500">Or try a sample trip</p>
+          <div className="flex flex-wrap gap-1.5">
+            {SAMPLE_TRIPS.map((trip) => (
+              <button
+                key={trip.name}
+                type="button"
+                onClick={() => loadSample(trip)}
+                disabled={planning}
+                className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 disabled:opacity-50"
+              >
+                {trip.name}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </form>

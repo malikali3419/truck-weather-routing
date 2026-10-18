@@ -6,9 +6,11 @@ import { bounds } from "../../lib/geo";
 import { useTripStore } from "../../store/useTripStore";
 import { CheckpointLayer } from "./CheckpointLayer";
 import { HeatmapLayer } from "./HeatmapLayer";
-import { RouteLayers } from "./RouteLayers";
+import { RouteLabels, RouteLayers } from "./RouteLayers";
 import { EndpointMarkers, TruckMarkers } from "./TruckMarkers";
 
+// On phones the forecast panel covers the bottom of the map.
+const IS_PHONE = typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches;
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 const INTERACTIVE = ["checkpoints", "route-hit"];
 
@@ -29,7 +31,7 @@ export function TripMap() {
     const [sw, ne] = bounds(geometries.flatMap((g) => g.coords));
     const desktop = window.innerWidth >= 768;
     map.fitBounds([sw, ne], {
-      padding: desktop ? { top: 60, bottom: 240, left: 60, right: 60 } : 30,
+      padding: desktop ? { top: 70, bottom: 290, left: 70, right: 70 } : 40,
       duration: 900,
     });
   }, [geometries]);
@@ -78,13 +80,14 @@ export function TripMap() {
       attributionControl={false}
       style={{ position: "absolute", inset: 0 }}
     >
-      <AttributionControl compact position="bottom-right" />
+      <AttributionControl compact position={IS_PHONE ? "top-right" : "bottom-right"} />
       <NavigationControl position="top-right" showCompass={false} />
       <ScaleControl position="top-left" unit="imperial" />
       {labelLayerId && <HeatmapLayer beforeId={labelLayerId} />}
       <RouteLayers />
       <CheckpointLayer />
       <EndpointMarkers />
+      <RouteLabels />
       <TruckMarkers />
     </Map>
   );

@@ -23,8 +23,8 @@ export function TruckMarkers() {
           <Marker key={route.id} longitude={lon} latitude={lat} anchor="center" style={{ zIndex: selected ? 3 : 2 }}>
             <div
               title={`Route ${route.id} truck${arrived ? " (arrived)" : ""}`}
-              className={`flex items-center gap-0.5 rounded-full border-2 px-1.5 py-0.5 text-[10px] font-bold shadow ${
-                selected ? "border-white bg-slate-900 text-white" : "border-white bg-white text-slate-700"
+              className={`flex items-center gap-1 rounded-full border-2 border-white px-1.5 py-0.5 text-[10px] font-bold shadow-float transition-transform ${
+                selected ? "scale-110 bg-slate-900 text-white" : "bg-white text-slate-600 opacity-90"
               }`}
             >
               <TruckIcon />
@@ -51,11 +51,11 @@ export function EndpointMarkers() {
   return (
     <>
       <Marker longitude={ends.start[0]} latitude={ends.start[1]} anchor="center">
-        <span title={request.origin.label} className="block h-4 w-4 rounded-full border-[3px] border-white bg-slate-900 shadow" />
+        <span title={request.origin.label} className="block h-4 w-4 rounded-full border-[3px] border-white bg-slate-900 shadow-float ring-4 ring-slate-900/15" />
       </Marker>
       <Marker longitude={ends.end[0]} latitude={ends.end[1]} anchor="bottom">
         <svg width="22" height="28" viewBox="0 0 22 28" aria-label={request.destination.label}>
-          <path d="M11 27s9-9.2 9-16a9 9 0 1 0-18 0c0 6.8 9 16 9 16z" fill="#0f172a" stroke="#fff" strokeWidth="2" />
+          <path d="M11 27s9-9.2 9-16a9 9 0 1 0-18 0c0 6.8 9 16 9 16z" fill="#4f46e5" stroke="#fff" strokeWidth="2" />
           <circle cx="11" cy="11" r="3.5" fill="#fff" />
         </svg>
       </Marker>

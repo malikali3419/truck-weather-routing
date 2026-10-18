@@ -1,12 +1,15 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { MapPin } from "lucide-react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useGeocode } from "../../api/hooks";
 import type { Place } from "../../api/types";
+import { Spinner } from "../../components/ui";
 
 interface Props {
   label: string;
   placeholder: string;
   value: Place | null;
   onChange: (place: Place | null) => void;
+  icon: ReactNode;
 }
 
 function useDebounced<T>(value: T, ms: number): T {
@@ -18,7 +21,7 @@ function useDebounced<T>(value: T, ms: number): T {
   return debounced;
 }
 
-export function PlaceInput({ label, placeholder, value, onChange }: Props) {
+export function PlaceInput({ label, placeholder, value, onChange, icon }: Props) {
   const id = useId();
   const [text, setText] = useState(value?.label ?? "");
   const [open, setOpen] = useState(false);
@@ -28,7 +31,7 @@ export function PlaceInput({ label, placeholder, value, onChange }: Props) {
   const { data: results = [], isFetching } = useGeocode(typing ? query : "");
   const wrapper = useRef<HTMLDivElement>(null);
 
-  // Reflect places set from outside (sample trips).
+  // Reflect places set from outside (sample trips, swap).
   useEffect(() => {
     if (value) setText(value.label);
   }, [value]);
@@ -51,18 +54,20 @@ export function PlaceInput({ label, placeholder, value, onChange }: Props) {
 
   return (
     <div ref={wrapper} className="relative">
-      <label htmlFor={id} className="field-label">
+      <label htmlFor={id} className="sr-only">
         {label}
       </label>
+      <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">{icon}</div>
       <input
         id={id}
-        className="field"
+        className="field pl-9 pr-9"
         placeholder={placeholder}
         value={text}
         autoComplete="off"
         role="combobox"
         aria-expanded={showList}
         aria-controls={`${id}-list`}
+        aria-autocomplete="list"
         onChange={(e) => {
           setText(e.target.value);
           setOpen(true);
@@ -86,14 +91,13 @@ export function PlaceInput({ label, placeholder, value, onChange }: Props) {
           }
         }}
       />
-      {isFetching && typing && (
-        <span className="absolute right-3 top-[34px] h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600" />
-      )}
+      {isFetching && typing && <Spinner className="absolute right-3 top-3 h-4 w-4 text-slate-400" />}
       {showList && (
         <ul
           id={`${id}-list`}
           role="listbox"
-          className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-slate-200 bg-white py-1 text-sm shadow-lg"
+          aria-label={`${label} suggestions`}
+          className="scrollbar-thin absolute z-30 mt-1.5 max-h-64 w-full overflow-auto rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-float"
         >
           {results.length === 0 && <li className="px-3 py-2 text-slate-500">No matches</li>}
           {results.map((place, i) => (
@@ -101,14 +105,15 @@ export function PlaceInput({ label, placeholder, value, onChange }: Props) {
               key={`${place.label}-${i}`}
               role="option"
               aria-selected={i === active}
-              className={`cursor-pointer px-3 py-2 ${i === active ? "bg-slate-100" : ""}`}
+              className={`flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 ${i === active ? "bg-brand-50 text-brand-900" : "text-slate-700"}`}
               onMouseEnter={() => setActive(i)}
               onMouseDown={(e) => {
                 e.preventDefault();
                 choose(place);
               }}
             >
-              {place.label}
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+              <span className="truncate">{place.label}</span>
             </li>
           ))}
         </ul>

@@ -155,3 +155,19 @@ def test_simulated_storm_hits_fastest_route_and_changes_recommendation(client):
     }
     heat = client.post("/api/heatmap", body, format="json").json()
     assert max(max(frame) for frame in heat["layers"]["risk"]) >= 3
+
+
+def test_dead_end_detours_are_rejected():
+    origin, via, dest = (-100.0, 40.0), (-99.0, 40.5), (-98.0, 40.0)
+    out_and_back = straight_route(origin, (-99.0, 40.0), n=50)
+    spur_out = straight_route((-99.0, 40.0), via, n=50)
+    spur_back = straight_route(via, (-99.0, 40.0), n=50)
+    rest = straight_route((-99.0, 40.0), dest, n=50)
+    coords = out_and_back.coords + spur_out.coords[1:] + spur_back.coords[1:] + rest.coords[1:]
+    detour = RawRoute(coords, 400_000, 4 * 3600, [float(i) for i in range(len(coords))])
+    assert alternatives.backtracks(detour, via)
+
+    clean = straight_route(origin, via, n=50)
+    leg2 = straight_route(via, dest, n=50)
+    through = RawRoute(clean.coords + leg2.coords[1:], 200_000, 3600, list(range(101)))
+    assert not alternatives.backtracks(through, via)

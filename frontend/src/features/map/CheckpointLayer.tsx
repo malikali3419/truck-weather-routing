@@ -3,9 +3,11 @@ import { Layer, Popup, Source } from "react-map-gl/maplibre";
 import type { FeatureCollection, Point } from "geojson";
 import type { Checkpoint } from "../../api/types";
 import { formatTimeLong } from "../../lib/format";
+import { CloudRain, Snowflake, Thermometer, Weight, Wind } from "lucide-react";
+import type { ReactNode } from "react";
+import { RiskPill } from "../../components/ui";
 import { RISK_COLOR, RISK_LABEL, riskColorExpression } from "../../lib/risk";
 import { useTripStore } from "../../store/useTripStore";
-import { RiskBadge } from "../routes/RiskBar";
 
 /** Checkpoints of the selected route, drawn by the GPU as one circle layer. */
 export function CheckpointLayer() {
@@ -17,7 +19,7 @@ export function CheckpointLayer() {
       type: "FeatureCollection",
       features: (route?.checkpoints ?? []).map((cp, index) => ({
         type: "Feature",
-        properties: { index, level: cp.level },
+        properties: { index, level: cp.level, flagged: cp.level === "LOW" ? 0 : 1 },
         geometry: { type: "Point", coordinates: [cp.lon, cp.lat] },
       })),
     }),
@@ -42,20 +44,33 @@ export function CheckpointLayer() {
           type="circle"
           paint={{
             "circle-color": riskColorExpression,
-            "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 3.5, 8, 5.5, 12, 7],
+            "circle-radius": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              4,
+              ["case", ["==", ["get", "flagged"], 1], 4, 2.5],
+              10,
+              ["case", ["==", ["get", "flagged"], 1], 7, 5],
+            ],
             "circle-stroke-color": "#ffffff",
-            "circle-stroke-width": 1.5,
+            "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 4, 1.2, 10, 2],
           }}
         />
       </Source>
       <Source id="checkpoint-focus" type="geojson" data={focusedData}>
         <Layer
+          id="checkpoint-focus-halo"
+          type="circle"
+          paint={{ "circle-color": "#0f172a", "circle-opacity": 0.18, "circle-radius": 16, "circle-blur": 0.4 }}
+        />
+        <Layer
           id="checkpoint-focus"
           type="circle"
           paint={{
             "circle-color": riskColorExpression,
-            "circle-radius": 9,
-            "circle-stroke-color": "#0f172a",
+            "circle-radius": 8,
+            "circle-stroke-color": "#ffffff",
             "circle-stroke-width": 3,
           }}
         />
@@ -78,7 +93,7 @@ function CheckpointPopup() {
       latitude={cp.lat}
       anchor="bottom"
       offset={12}
-      maxWidth="280px"
+      maxWidth="300px"
       onClose={() => openPopup(null)}
       closeOnClick={false}
     >
@@ -87,50 +102,54 @@ function CheckpointPopup() {
   );
 }
 
+function Row({ icon, label, value, level }: { icon: ReactNode; label: string; value: string; level?: Checkpoint["level"] }) {
+  return (
+    <div className="flex items-center gap-2 py-1">
+      <span className="text-slate-400">{icon}</span>
+      <span className="text-slate-500">{label}</span>
+      <span className="ml-auto tabular-nums text-slate-800">{value}</span>
+      {level && (
+        <span className="w-16 text-right text-[11px] font-semibold" style={{ color: RISK_COLOR[level] }}>
+          {RISK_LABEL[level]}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function CheckpointDetails({ routeId, cp }: { routeId: string; cp: Checkpoint }) {
   const w = cp.weather;
-  const factors: [string, keyof Checkpoint["factors"], string][] = [
-    ["Wind", "wind", `${Math.round(w.wind_mph)} mph (gusts ${Math.round(w.gust_mph)})`],
-    ["Rain", "rain", `${w.rain_in_hr.toFixed(2)} in/hr`],
-    ["Snow", "snow", `${w.snow_in_hr.toFixed(2)} in/hr`],
-    ["Wind + load", "load", ""],
-  ];
   return (
-    <div className="space-y-2 text-xs text-slate-700">
-      <div className="flex items-center justify-between gap-3 pr-4">
-        <span className="font-semibold text-slate-900">
-          Route {routeId} · mile {Math.round(cp.mile)}
-        </span>
-        <RiskBadge level={cp.level} />
+    <div className="w-60 text-xs" data-testid="checkpoint-popup">
+      <div className="flex items-start justify-between gap-3 pr-5">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+            Route {routeId} · mile {Math.round(cp.mile)}
+          </p>
+          <p className="mt-0.5 text-sm font-semibold text-slate-900">{formatTimeLong(cp.eta_unix)}</p>
+        </div>
       </div>
-      <p className="text-slate-500">Truck arrives {formatTimeLong(cp.eta_unix)}</p>
-      <table className="w-full">
-        <tbody>
-          {factors.map(([label, key, value]) => (
-            <tr key={key}>
-              <td className="py-0.5 text-slate-500">{label}</td>
-              <td className="py-0.5 text-right tabular-nums">{value}</td>
-              <td className="py-0.5 pl-2 text-right">
-                <span className="font-medium" style={{ color: RISK_COLOR[cp.factors[key]] }}>
-                  {RISK_LABEL[cp.factors[key]]}
-                </span>
-              </td>
-            </tr>
-          ))}
-          <tr>
-            <td className="py-0.5 text-slate-500">Temperature</td>
-            <td className="py-0.5 text-right tabular-nums">{Math.round(w.temp_f)}°F</td>
-            <td />
-          </tr>
-        </tbody>
-      </table>
+      <div className="mt-2">
+        <RiskPill level={cp.level} />
+      </div>
+      <div className="mt-2 divide-y divide-slate-100">
+        <Row icon={<Wind className="h-3.5 w-3.5" />} label="Wind" value={`${Math.round(w.wind_mph)} mph`} level={cp.factors.wind} />
+        <Row icon={<CloudRain className="h-3.5 w-3.5" />} label="Rain" value={`${w.rain_in_hr.toFixed(2)} in/hr`} level={cp.factors.rain} />
+        <Row icon={<Snowflake className="h-3.5 w-3.5" />} label="Snow" value={`${w.snow_in_hr.toFixed(2)} in/hr`} level={cp.factors.snow} />
+        <Row icon={<Weight className="h-3.5 w-3.5" />} label="Wind + load" value="" level={cp.factors.load} />
+        <Row
+          icon={<Thermometer className="h-3.5 w-3.5" />}
+          label="Temp · gusts"
+          value={`${Math.round(w.temp_f)}°F · ${Math.round(w.gust_mph)} mph`}
+        />
+      </div>
       {cp.reasons.length > 0 && (
-        <p className="rounded bg-slate-50 px-2 py-1 text-slate-700">
-          <span className="font-medium">Why: </span>
+        <p className="mt-2 rounded-lg bg-slate-50 px-2.5 py-1.5 leading-relaxed text-slate-700">
+          <span className="font-semibold">Why: </span>
           {cp.reasons.join("; ")}
         </p>
       )}
-      {w.beyond_forecast && <p className="text-amber-700">ETA is past the forecast range; nearest forecast used.</p>}
+      {w.beyond_forecast && <p className="mt-2 text-amber-700">ETA is past the forecast range; nearest forecast used.</p>}
     </div>
   );
 }

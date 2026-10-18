@@ -4,6 +4,9 @@ import type { HeatLayer, PlanRequest, PlanResponse } from "../api/types";
 interface TripState {
   request: PlanRequest | null;
   plan: PlanResponse | null;
+  planError: string | null;
+  /** The trip form is expanded (always true before the first plan). */
+  formOpen: boolean;
   selectedRouteId: string | null;
   /** Checkpoint index on the selected route that is hovered or focused. */
   focusedCheckpoint: number | null;
@@ -15,6 +18,8 @@ interface TripState {
   playing: boolean;
 
   setPlan: (request: PlanRequest, plan: PlanResponse) => void;
+  setPlanError: (message: string | null) => void;
+  setFormOpen: (open: boolean) => void;
   selectRoute: (id: string) => void;
   focusCheckpoint: (index: number | null) => void;
   openPopup: (index: number | null) => void;
@@ -26,6 +31,8 @@ interface TripState {
 export const useTripStore = create<TripState>((set) => ({
   request: null,
   plan: null,
+  planError: null,
+  formOpen: true,
   selectedRouteId: null,
   focusedCheckpoint: null,
   popupCheckpoint: null,
@@ -34,18 +41,28 @@ export const useTripStore = create<TripState>((set) => ({
   playing: false,
 
   setPlan: (request, plan) =>
-    set((s) => ({
-      request,
-      plan,
-      // Keep the user's route choice when only the sample interval changed.
-      selectedRouteId:
-        s.selectedRouteId && plan.routes.some((r) => r.id === s.selectedRouteId) &&
-        s.request?.departure_at === request.departure_at
+    set((s) => {
+      // Same trip with a new sample interval: keep the route the user picked.
+      const sameTrip =
+        s.request?.departure_at === request.departure_at &&
+        s.request?.origin.label === request.origin.label &&
+        s.request?.destination.label === request.destination.label;
+      const keepSelection = sameTrip && plan.routes.some((r) => r.id === s.selectedRouteId);
+      return {
+        request,
+        plan,
+        planError: null,
+        formOpen: false,
+        selectedRouteId: keepSelection
           ? s.selectedRouteId
           : (plan.recommendation.route_id ?? plan.routes[0]?.id ?? null),
-      focusedCheckpoint: null,
-      popupCheckpoint: null,
-    })),
+        hour: sameTrip ? s.hour : 0,
+        focusedCheckpoint: null,
+        popupCheckpoint: null,
+      };
+    }),
+  setPlanError: (planError) => set({ planError }),
+  setFormOpen: (formOpen) => set({ formOpen }),
   selectRoute: (id) => set({ selectedRouteId: id, focusedCheckpoint: null, popupCheckpoint: null }),
   focusCheckpoint: (index) => set({ focusedCheckpoint: index }),
   openPopup: (index) => set({ popupCheckpoint: index }),

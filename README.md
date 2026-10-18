@@ -109,9 +109,20 @@ npm run dev                                # http://localhost:5173, proxies /api
 cd backend && DEBUG=1 .venv/bin/pytest     # thresholds, load rules, sampling, ETAs, scoring,
                                            # recommendation, weather interpolation, API, fallback
 cd frontend && npm test                    # polyline decoding and geometry helpers
+cd frontend && npm run e2e                 # Playwright: every UI feature (see below)
+cd frontend && npm run e2e:live            # Playwright against the running backend + real APIs
 ```
 
-CI (`.github/workflows/ci.yml`) runs lint, the backend tests and the frontend build on every push.
+The Playwright **ui** suite (`frontend/e2e/`) runs the React app with `/api` answered from recorded real responses (`e2e/fixtures/`), so it is fast and repeatable. It covers:
+
+- the trip form: autocomplete by mouse and keyboard, swapping origin and destination, validation, the exact request sent (including the departure time-zone conversion), the loading state, and API error messages
+- results: three route cards, the recommendation and its reasons, selecting routes from cards and map labels, re-planning when the interval changes, the checkpoint filter and map popup, editing the trip, and the "no safe route" warning
+- the forecast panel: the slider, play and pause, heatmap layers, the risk strip, and retrying after a heatmap error
+- the simulated storm, the routing-fallback notice, and the phone layout (no horizontal scroll)
+
+The **live** suite plans real trips through the running Django server, including an uncached one, and checks that the heatmap loads.
+
+CI (`.github/workflows/ci.yml`) runs lint, the backend tests, the frontend build and the Playwright ui suite on every push.
 
 ## Deploy (free)
 

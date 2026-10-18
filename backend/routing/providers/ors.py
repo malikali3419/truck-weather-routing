@@ -21,7 +21,7 @@ _ERRORS = {
 
 
 class OrsClient:
-    def __init__(self, api_key: str, base_url: str, timeout: float = 15.0):
+    def __init__(self, api_key: str, base_url: str, timeout: float = 10.0):
         if not api_key:
             raise ProviderError("ORS_API_KEY is not configured", status=500)
         self._http = httpx.Client(

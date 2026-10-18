@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useIsMutating, useMutation, useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useTripStore } from "../store/useTripStore";
 import { cumulativeMiles, decodePolyline, type LngLat } from "../lib/geo";
@@ -16,12 +16,23 @@ export function useGeocode(query: string) {
   });
 }
 
+const PLAN_KEY = ["plan"];
+
 export function usePlanTrip() {
   const setPlan = useTripStore((s) => s.setPlan);
+  const setPlanError = useTripStore((s) => s.setPlanError);
   return useMutation({
+    mutationKey: PLAN_KEY,
     mutationFn: (req: PlanRequest) => api.plan(req).then((plan) => ({ req, plan })),
+    onMutate: () => setPlanError(null),
     onSuccess: ({ req, plan }) => setPlan(req, plan),
+    onError: (err) => setPlanError(err.message),
   });
+}
+
+/** True while any trip plan request is in flight. */
+export function usePlanning(): boolean {
+  return useIsMutating({ mutationKey: PLAN_KEY }) > 0;
 }
 
 /** Heatmap frames for the current plan. Fetched once; the slider is client-side. */

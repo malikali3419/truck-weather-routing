@@ -2,34 +2,102 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    font-feature-settings: "cv11", "ss01";
+  }
+  body {
+    @apply bg-slate-100 text-slate-900 antialiased;
+  }
+}
+
 @layer components {
+  .card {
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-card;
+  }
   .field-label {
-    @apply mb-1 block text-xs font-medium text-slate-600;
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500;
   }
   .field {
-    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10;
+    @apply h-10 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/10;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/30 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900;
+  }
+  .stat-label {
+    @apply text-[10px] font-semibold uppercase tracking-wide text-slate-400;
   }
 }
 
-body {
-  margin: 0;
-  background: #f8fafc;
-  -webkit-font-smoothing: antialiased;
+/* Forecast slider: filled track up to the thumb (--p is set inline). */
+.timeline-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #4f46e5 var(--p), #e2e8f0 var(--p));
+  outline: none;
+  cursor: pointer;
+}
+.timeline-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #4f46e5;
+  box-shadow: 0 2px 6px rgb(15 23 42 / 0.25);
+  transition: transform 0.12s;
+}
+.timeline-range::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+.timeline-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #4f46e5;
+  box-shadow: 0 2px 6px rgb(15 23 42 / 0.25);
+}
+.timeline-range:focus-visible {
+  box-shadow: 0 0 0 4px rgb(99 102 241 / 0.2);
 }
 
-/* Keep popups above the truck markers. */
+/* Map popups and controls */
 .maplibregl-popup {
   z-index: 10;
 }
-
 .maplibregl-popup-content {
-  border-radius: 12px;
-  padding: 12px 14px;
-  box-shadow: 0 10px 30px rgb(15 23 42 / 0.18);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 16px 40px -8px rgb(15 23 42 / 0.28);
+  font-family: inherit;
 }
-
 .maplibregl-popup-close-button {
   font-size: 18px;
-  padding: 2px 8px;
-  color: #64748b;
+  padding: 4px 10px;
+  color: #94a3b8;
+  border-radius: 0 14px 0 8px;
+}
+.maplibregl-popup-close-button:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+.maplibregl-ctrl-group {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgb(15 23 42 / 0.12) !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-scale {
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.85);
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
 }
