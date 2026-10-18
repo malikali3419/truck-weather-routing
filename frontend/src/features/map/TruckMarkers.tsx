@@ -1,4 +1,3 @@
-import { Truck } from "lucide-react";
 import { useMemo } from "react";
 import { Marker } from "react-map-gl/maplibre";
 import { useRouteGeometries } from "../../api/hooks";
@@ -37,35 +36,32 @@ export function TruckMarkers() {
         const arrived = offset >= route.duration_s;
         const waiting = offset <= 0;
         const state = arrived ? "arrived" : waiting ? "waiting to depart" : "en route";
+        // The emoji faces left; mirror it when the truck is heading east.
+        const facingEast = !waiting && !arrived ? dir > 0 && dir < 180 : true;
         return (
           <Marker key={route.id} longitude={here[0]} latitude={here[1]} anchor="center" style={{ zIndex: selected ? 5 : 3 }}>
             <div
-              className="relative"
+              className="relative flex flex-col items-center"
               data-testid={`truck-${route.id}`}
               title={`Route ${route.id} truck, ${state}`}
               aria-label={`Route ${route.id} truck, ${state}`}
+              role="img"
             >
-              {!arrived && !waiting && (
-                <div className="pointer-events-none absolute inset-0" style={{ transform: `rotate(${dir}deg)` }}>
-                  <span
-                    className={`absolute left-1/2 -translate-x-1/2 border-x-[5px] border-b-[7px] border-x-transparent ${
-                      selected ? "-top-[9px] border-b-sky-500" : "-top-[8px] border-b-slate-400"
-                    }`}
-                  />
-                </div>
+              {selected && (
+                <span className="pointer-events-none absolute left-1/2 top-1/2 h-8 w-12 -translate-x-1/2 -translate-y-1/3 rounded-full bg-sky-400/40 blur-md" />
               )}
-              <div
-                className={`flex items-center justify-center rounded-full border-2 border-white shadow-[0_4px_14px_rgba(0,0,0,0.35)] transition-[width,height] ${
-                  selected
-                    ? "h-9 w-9 bg-gradient-to-br from-sky-400 to-indigo-500 text-white"
-                    : "h-7 w-7 bg-slate-700 text-white opacity-90 dark:bg-slate-600"
-                }`}
-              >
-                <Truck className={selected ? "h-[18px] w-[18px]" : "h-3.5 w-3.5"} strokeWidth={2.2} />
-              </div>
               <span
-                className={`absolute -bottom-1 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full border border-white px-1 text-[9px] font-bold ${
-                  selected ? "bg-white text-indigo-600" : "bg-slate-200 text-slate-700"
+                aria-hidden
+                className={`relative select-none leading-none drop-shadow-[0_3px_4px_rgba(0,0,0,0.45)] ${
+                  selected ? "text-[34px]" : "text-[24px] opacity-90"
+                }`}
+                style={{ transform: facingEast ? "scaleX(-1)" : undefined }}
+              >
+                🚛
+              </span>
+              <span
+                className={`-mt-1 rounded-full px-1.5 text-[9px] font-bold leading-[14px] shadow ${
+                  selected ? "bg-gradient-to-r from-sky-500 to-indigo-500 text-white" : "bg-white text-slate-700"
                 }`}
               >
                 {route.id}

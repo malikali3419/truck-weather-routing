@@ -1,4 +1,3 @@
-import { Truck } from "lucide-react";
 import { useMemo, useRef, type MouseEvent } from "react";
 import { formatTime } from "../../lib/format";
 import { RISK_COLOR, RISK_LABEL } from "../../lib/risk";
@@ -82,14 +81,16 @@ export function RiskProfileStrip() {
         {cp && (
           <div className="absolute -inset-y-1 w-0.5 rounded bg-fg" style={{ left: `${(cp.mile / total) * 100}%` }} />
         )}
-        <div
-          className="pointer-events-none absolute top-1/2 flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-sky-400 to-indigo-500 text-white shadow-[0_4px_12px_rgba(0,0,0,0.35)]"
-          style={{ left: `${(truckMile / total) * 100}%` }}
+        <span
+          className="pointer-events-none absolute top-1/2 select-none text-[22px] leading-none drop-shadow-[0_2px_3px_rgba(0,0,0,0.4)]"
+          style={{ left: `${(truckMile / total) * 100}%`, transform: "translateX(-50%) translateY(-60%) scaleX(-1)" }}
           title="Truck position at slider time"
           data-testid="strip-truck"
+          role="img"
+          aria-label="Truck position at slider time"
         >
-          <Truck className="h-3.5 w-3.5" strokeWidth={2.2} />
-        </div>
+          🚛
+        </span>
       </div>
       <div className="mt-1 flex justify-between text-[10px] tabular-nums text-subtle">
         <span>0 mi</span>
