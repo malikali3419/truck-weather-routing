@@ -9,6 +9,8 @@ import { RiskProfileStrip } from "./RiskProfileStrip";
 import { useSliderTime } from "./useSliderTime";
 
 const MAX_HOUR = 48;
+// Forecast hours played per real second: the full 48 h takes 24 s.
+const PLAY_SPEED = 2;
 const LAYER_OPTIONS: { value: HeatLayer | null; label: React.ReactNode; title: string }[] = [
   { value: "risk", label: <><Gauge className="h-3.5 w-3.5" />Risk</>, title: "Risk level for your load" },
   { value: "wind", label: <><Wind className="h-3.5 w-3.5" />Wind</>, title: "Sustained wind" },
@@ -33,26 +35,46 @@ export function ForecastPanel() {
   const heatmap = useHeatmap();
   const time = useSliderTime();
 
+  // Continuous playback: time advances every animation frame, so trucks drive
+  // smoothly instead of jumping from hour to hour.
   useEffect(() => {
     if (!playing) return;
-    const id = window.setInterval(() => {
-      const next = useTripStore.getState().hour + 1;
-      setHour(next > MAX_HOUR ? 0 : next);
-    }, 450);
-    return () => window.clearInterval(id);
-  }, [playing, setHour]);
+    if (useTripStore.getState().hour >= MAX_HOUR) setHour(0);
+    let frame = 0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      const dt = Math.min((now - last) / 1000, 0.1);
+      last = now;
+      const next = useTripStore.getState().hour + dt * PLAY_SPEED;
+      if (next >= MAX_HOUR) {
+        setHour(MAX_HOUR);
+        setPlaying(false);
+        return;
+      }
+      setHour(next);
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [playing, setHour, setPlaying]);
+
+  const wholeHour = Math.floor(hour);
+  const step = (delta: number) => {
+    setPlaying(false);
+    setHour(Math.min(MAX_HOUR, Math.max(0, wholeHour + delta)));
+  };
 
   return (
     <section
       aria-label="Forecast timeline"
-      className="pointer-events-auto rounded-2xl border border-white/10 bg-ink-900/80 p-3 shadow-glass backdrop-blur-xl md:p-4"
+      className="pointer-events-auto rounded-2xl border border-overlay/10 bg-ink-900/80 p-3 shadow-glass backdrop-blur-xl md:p-4"
     >
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Forecast at</p>
-          <p className="text-sm font-semibold tabular-nums text-white" data-testid="slider-time">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-subtle">Forecast at</p>
+          <p className="text-sm font-semibold tabular-nums text-fg" data-testid="slider-time">
             {formatTimeLong(time)}
-            <span className="ml-2 rounded-md bg-sky-400/15 px-1.5 py-0.5 text-xs text-sky-300 ring-1 ring-inset ring-sky-400/25">+{hour}h</span>
+            <span className="ml-2 rounded-md bg-sky-400/15 px-1.5 py-0.5 text-xs text-sky-700 dark:text-sky-300 ring-1 ring-inset ring-sky-400/25">+{wholeHour}h</span>
           </p>
         </div>
         <Segmented
@@ -79,18 +101,25 @@ export function ForecastPanel() {
             type="range"
             min={0}
             max={MAX_HOUR}
-            step={1}
+            step="any"
             value={hour}
             onChange={(e) => {
               setPlaying(false);
-              setHour(Number(e.target.value));
+              setHour(Math.round(Number(e.target.value)));
+            }}
+            onKeyDown={(e) => {
+              const keys: Record<string, number> = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 };
+              if (e.key in keys) {
+                e.preventDefault();
+                step(keys[e.key]);
+              }
             }}
             aria-label="Forecast hour after departure"
-            aria-valuetext={`${hour} hours after departure, ${formatTimeLong(time)}`}
+            aria-valuetext={`${wholeHour} hours after departure, ${formatTimeLong(time)}`}
             className="timeline-range w-full"
             style={{ ["--p" as string]: `${(hour / MAX_HOUR) * 100}%` }}
           />
-          <div className="mt-1.5 hidden justify-between text-[10px] font-medium text-slate-500 sm:flex">
+          <div className="mt-1.5 hidden justify-between text-[10px] font-medium text-subtle sm:flex">
             <span>Depart</span>
             <span>+12h</span>
             <span>+24h</span>
@@ -100,16 +129,16 @@ export function ForecastPanel() {
         </div>
       </div>
 
-      <div className="mt-2 hidden items-center justify-between gap-3 text-[11px] text-slate-400 sm:flex">
+      <div className="mt-2 hidden items-center justify-between gap-3 text-[11px] text-muted sm:flex">
         <span className="flex items-center gap-1.5">
           {heatmap.isFetching && !heatmap.data && (
             <>
-              <Spinner className="h-3 w-3 text-sky-400" />
+              <Spinner className="h-3 w-3 text-sky-600 dark:text-sky-400" />
               Loading forecast grid…
             </>
           )}
           {heatmap.isError && (
-            <span className="text-rose-300">
+            <span className="text-rose-600 dark:text-rose-300">
               Heatmap unavailable.{" "}
               <button type="button" className="font-medium underline" onClick={() => heatmap.refetch()}>
                 Retry
@@ -121,7 +150,7 @@ export function ForecastPanel() {
         <RiskLegend />
       </div>
 
-      <div className="mt-3 hidden border-t border-white/[0.06] pt-3 sm:block">
+      <div className="mt-3 hidden border-t border-overlay/[0.06] pt-3 sm:block">
         <RiskProfileStrip />
       </div>
     </section>

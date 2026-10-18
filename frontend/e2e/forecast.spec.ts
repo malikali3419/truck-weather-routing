@@ -82,3 +82,29 @@ test("heatmap errors can be retried", async ({ page }) => {
   await expect(page.getByText("Risk for your load")).toBeVisible();
   await expect(page.getByText("Heatmap unavailable.")).toBeHidden();
 });
+
+test("play drives the trucks along their routes", async ({ page }) => {
+  await mockApi(page);
+  await page.goto("/");
+  await planSampleTrip(page);
+  await expect(page.getByText("Loading forecast grid…")).toBeHidden();
+
+  const truck = page.getByTestId("truck-A");
+  const stripTruck = page.getByTestId("strip-truck");
+  const start = (await truck.boundingBox())!;
+  const stripStart = (await stripTruck.boundingBox())!;
+
+  await page.getByRole("button", { name: "Play forecast animation" }).click();
+  await page.waitForTimeout(1500);
+  const moving = (await truck.boundingBox())!;
+  const moved = Math.hypot(moving.x - start.x, moving.y - start.y);
+  expect(moved, "truck moved on the map").toBeGreaterThan(5);
+  expect((await stripTruck.boundingBox())!.x).toBeGreaterThan(stripStart.x);
+  await expect(truck).toHaveAttribute("aria-label", /en route/);
+
+  await page.getByRole("button", { name: "Pause forecast animation" }).click();
+  const paused = (await truck.boundingBox())!;
+  await page.waitForTimeout(800);
+  const after = (await truck.boundingBox())!;
+  expect(Math.hypot(after.x - paused.x, after.y - paused.y)).toBeLessThan(1);
+});

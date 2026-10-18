@@ -1,25 +1,26 @@
 /** @type {import('tailwindcss').Config} */
+const v = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
 export default {
+  darkMode: "class",
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
       },
+      // Theme tokens: values live in index.css and switch with the .dark class.
       colors: {
-        // Deep navy surfaces
-        ink: {
-          950: "#060a13",
-          900: "#0a101d",
-          850: "#0d1424",
-          800: "#111a2e",
-          700: "#1a2540",
-        },
+        ink: { 950: v("ink-950"), 900: v("ink-900"), 850: v("ink-850"), 800: v("ink-800"), 700: v("ink-700") },
+        overlay: v("overlay"),
+        fg: { DEFAULT: v("fg"), 2: v("fg-2") },
+        muted: v("muted"),
+        subtle: v("subtle"),
       },
       boxShadow: {
-        glass: "0 10px 40px -12px rgb(0 0 0 / 0.65), inset 0 1px 0 rgb(255 255 255 / 0.04)",
+        glass: "var(--shadow-glass)",
         glow: "0 8px 28px -8px rgb(56 189 248 / 0.55)",
-        "glow-emerald": "0 8px 28px -10px rgb(52 211 153 / 0.45)",
+        "glow-emerald": "var(--shadow-glow-emerald)",
       },
       keyframes: {
         shimmer: { "100%": { transform: "translateX(100%)" } },

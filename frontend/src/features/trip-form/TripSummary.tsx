@@ -28,10 +28,10 @@ export function TripSummary() {
           <span className="h-2.5 w-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-white" title={request.origin.label}>
+          <p className="truncate text-sm font-semibold text-fg" title={request.origin.label}>
             {shortName(request.origin.label)}
           </p>
-          <p className="mt-3 truncate text-sm font-semibold text-white" title={request.destination.label}>
+          <p className="mt-3 truncate text-sm font-semibold text-fg" title={request.destination.label}>
             {shortName(request.destination.label)}
           </p>
         </div>
@@ -41,7 +41,7 @@ export function TripSummary() {
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
         <span className="inline-flex items-center gap-1.5">
           <CalendarClock className="h-3.5 w-3.5" />
           {formatTimeLong(plan.departure_unix)}
@@ -51,15 +51,15 @@ export function TripSummary() {
           {request.load_weight_lb.toLocaleString()} lb
         </span>
         {plan.scenario && (
-          <span className="inline-flex items-center gap-1.5 font-medium text-amber-300">
+          <span className="inline-flex items-center gap-1.5 font-medium text-amber-700 dark:text-amber-300">
             <CloudLightning className="h-3.5 w-3.5" />
             Simulated storm
           </span>
         )}
       </div>
 
-      <div className="mt-3 flex items-center gap-3 border-t border-white/[0.06] pt-3">
-        <span className="shrink-0 text-xs font-medium text-slate-500">Check every</span>
+      <div className="mt-3 flex items-center gap-3 border-t border-overlay/[0.06] pt-3">
+        <span className="shrink-0 text-xs font-medium text-subtle">Check every</span>
         <Segmented
           label="Check weather every"
           size="sm"
@@ -68,10 +68,10 @@ export function TripSummary() {
           value={request.sample_interval_mi}
           onChange={(value) => planTrip.mutate({ ...request, sample_interval_mi: value })}
         />
-        {planning && <Spinner className="h-3.5 w-3.5 text-sky-400" />}
+        {planning && <Spinner className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />}
       </div>
       {planError && (
-        <p role="alert" className="mt-2 rounded-lg border border-rose-500/25 bg-rose-500/10 px-2.5 py-1.5 text-xs text-rose-200">
+        <p role="alert" className="mt-2 rounded-lg border border-rose-500/25 bg-rose-500/10 px-2.5 py-1.5 text-xs text-rose-700 dark:text-rose-200">
           {planError}
         </p>
       )}

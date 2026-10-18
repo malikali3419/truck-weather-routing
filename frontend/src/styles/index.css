@@ -2,43 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------- Theme tokens ---------- */
+:root {
+  --ink-950: 241 244 249; /* page */
+  --ink-900: 255 255 255;
+  --ink-850: 255 255 255;
+  --ink-800: 248 250 252;
+  --ink-700: 226 232 240;
+  --overlay: 15 23 42; /* tints and borders are drawn with this colour */
+  --fg: 15 23 42;
+  --fg-2: 51 65 85;
+  --muted: 71 85 105;
+  --subtle: 100 116 139;
+  --shadow-glass: 0 1px 2px rgb(15 23 42 / 0.05), 0 8px 24px -12px rgb(15 23 42 / 0.18);
+  --shadow-glow-emerald: 0 8px 24px -12px rgb(16 185 129 / 0.35);
+  --popup-bg: 255 255 255;
+  color-scheme: light;
+}
+
+.dark {
+  --ink-950: 6 10 19;
+  --ink-900: 10 16 29;
+  --ink-850: 13 20 36;
+  --ink-800: 17 26 46;
+  --ink-700: 26 37 64;
+  --overlay: 255 255 255;
+  --fg: 241 245 249;
+  --fg-2: 203 213 225;
+  --muted: 148 163 184;
+  --subtle: 100 116 139;
+  --shadow-glass: 0 10px 40px -12px rgb(0 0 0 / 0.65), inset 0 1px 0 rgb(255 255 255 / 0.04);
+  --shadow-glow-emerald: 0 8px 28px -10px rgb(52 211 153 / 0.45);
+  --popup-bg: 13 20 36;
+  color-scheme: dark;
+}
+
 @layer base {
   html {
     font-feature-settings: "cv11", "ss01";
-    color-scheme: dark;
   }
   body {
-    @apply bg-ink-950 text-slate-200 antialiased;
+    @apply bg-ink-950 text-fg antialiased transition-colors duration-300;
   }
 }
 
 @layer components {
-  /* Frosted-glass panel */
+  /* Glass panel: white card in light mode, frosted glass in dark mode */
   .card {
-    @apply rounded-2xl border border-white/[0.07] bg-white/[0.035] shadow-glass backdrop-blur-xl;
+    @apply rounded-2xl border border-slate-200/80 bg-white/85 shadow-glass backdrop-blur-xl dark:border-white/[0.07] dark:bg-white/[0.035];
   }
   .field-label {
-    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500;
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.08em] text-subtle;
   }
   .field {
-    @apply h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 hover:border-white/20 focus:border-sky-400/60 focus:bg-white/[0.06] focus:ring-4 focus:ring-sky-400/15;
+    @apply h-10 w-full rounded-xl border border-overlay/10 bg-overlay/[0.03] px-3 text-sm text-fg outline-none transition placeholder:text-subtle hover:border-overlay/20 focus:border-sky-500/60 focus:bg-ink-900 focus:ring-4 focus:ring-sky-400/15 dark:bg-overlay/[0.04] dark:focus:bg-overlay/[0.06];
   }
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500 px-4 text-sm font-semibold text-white shadow-glow transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-400/30 disabled:cursor-not-allowed disabled:opacity-60;
   }
   .btn-ghost {
-    @apply inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-slate-400 transition hover:bg-white/[0.06] hover:text-white;
+    @apply inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-muted transition hover:bg-overlay/[0.06] hover:text-fg;
   }
   .stat-label {
-    @apply text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500;
-  }
-  .text-gradient {
-    @apply bg-gradient-to-r from-sky-300 to-indigo-300 bg-clip-text text-transparent;
+    @apply text-[10px] font-semibold uppercase tracking-[0.08em] text-subtle;
   }
 }
 
 /* Soft colour glows behind the sidebar content */
 .aurora {
+  background:
+    radial-gradient(600px 300px at -10% -10%, rgb(56 189 248 / 0.1), transparent 60%),
+    radial-gradient(500px 400px at 110% 30%, rgb(99 102 241 / 0.08), transparent 60%),
+    #f4f6fb;
+}
+.dark .aurora {
   background:
     radial-gradient(600px 300px at -10% -10%, rgb(56 189 248 / 0.12), transparent 60%),
     radial-gradient(500px 400px at 110% 30%, rgb(99 102 241 / 0.1), transparent 60%),
@@ -54,7 +91,7 @@
   border-radius: 999px;
   background:
     linear-gradient(to right, #38bdf8, #6366f1) 0 / var(--p) 100% no-repeat,
-    rgb(255 255 255 / 0.1);
+    rgb(var(--overlay) / 0.1);
   outline: none;
   cursor: pointer;
 }
@@ -65,7 +102,7 @@
   border-radius: 50%;
   background: #fff;
   border: 3px solid #6366f1;
-  box-shadow: 0 0 0 4px rgb(99 102 241 / 0.25), 0 4px 12px rgb(0 0 0 / 0.5);
+  box-shadow: 0 0 0 4px rgb(99 102 241 / 0.25), 0 4px 12px rgb(0 0 0 / 0.3);
   transition: transform 0.12s;
 }
 .timeline-range::-webkit-slider-thumb:hover {
@@ -83,76 +120,86 @@
   box-shadow: 0 0 0 4px rgb(56 189 248 / 0.25);
 }
 
-/* Map popups */
+/* ---------- Map popups ---------- */
 .maplibregl-popup {
   z-index: 10;
 }
 .maplibregl-popup-content {
   border-radius: 16px;
   padding: 14px 16px;
-  background: rgb(13 20 36 / 0.96);
-  border: 1px solid rgb(255 255 255 / 0.09);
-  box-shadow: 0 20px 50px -10px rgb(0 0 0 / 0.7);
+  background: rgb(var(--popup-bg) / 0.97);
+  border: 1px solid rgb(var(--overlay) / 0.09);
+  box-shadow: 0 20px 50px -10px rgb(0 0 0 / 0.35);
   backdrop-filter: blur(16px);
   font-family: inherit;
-  color: #e2e8f0;
+  color: rgb(var(--fg));
+}
+.dark .maplibregl-popup-content {
+  box-shadow: 0 20px 50px -10px rgb(0 0 0 / 0.7);
 }
 .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
-  border-top-color: rgb(13 20 36 / 0.96);
+  border-top-color: rgb(var(--popup-bg) / 0.97);
 }
 .maplibregl-popup-anchor-top .maplibregl-popup-tip {
-  border-bottom-color: rgb(13 20 36 / 0.96);
+  border-bottom-color: rgb(var(--popup-bg) / 0.97);
 }
 .maplibregl-popup-close-button {
   font-size: 18px;
   padding: 4px 10px;
-  color: #64748b;
+  color: rgb(var(--subtle));
   border-radius: 0 16px 0 8px;
 }
 .maplibregl-popup-close-button:hover {
-  background: rgb(255 255 255 / 0.06);
-  color: #fff;
+  background: rgb(var(--overlay) / 0.06);
+  color: rgb(var(--fg));
 }
 
-/* Map controls in the dark theme */
+/* ---------- Map controls ---------- */
 .maplibregl-ctrl-group {
-  background: rgb(13 20 36 / 0.9) !important;
-  border: 1px solid rgb(255 255 255 / 0.08);
   border-radius: 12px !important;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.5) !important;
+  box-shadow: 0 4px 12px rgb(15 23 42 / 0.12) !important;
   overflow: hidden;
-}
-.maplibregl-ctrl-group button + button {
-  border-top: 1px solid rgb(255 255 255 / 0.08) !important;
-}
-.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
-  filter: invert(1) brightness(0.85);
-}
-.maplibregl-ctrl-group button:hover {
-  background: rgb(255 255 255 / 0.06) !important;
 }
 .maplibregl-ctrl-scale {
   border-radius: 6px;
-  background: rgb(13 20 36 / 0.8);
+  background: rgb(var(--ink-900) / 0.85);
+}
+.maplibregl-ctrl-attrib {
+  border-radius: 10px !important;
+}
+.dark .maplibregl-ctrl-group {
+  background: rgb(13 20 36 / 0.9) !important;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.5) !important;
+}
+.dark .maplibregl-ctrl-group button + button {
+  border-top: 1px solid rgb(255 255 255 / 0.08) !important;
+}
+.dark .maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(0.85);
+}
+.dark .maplibregl-ctrl-group button:hover {
+  background: rgb(255 255 255 / 0.06) !important;
+}
+.dark .maplibregl-ctrl-scale {
   border-color: rgb(148 163 184 / 0.6);
   color: #94a3b8;
 }
-.maplibregl-ctrl-attrib {
+.dark .maplibregl-ctrl-attrib {
   background: rgb(13 20 36 / 0.75) !important;
-  color: #94a3b8;
-  border-radius: 10px !important;
 }
-.maplibregl-ctrl-attrib-inner {
+.dark .maplibregl-ctrl-attrib,
+.dark .maplibregl-ctrl-attrib-inner {
   color: #94a3b8;
 }
-.maplibregl-ctrl-attrib a {
+.dark .maplibregl-ctrl-attrib a {
   color: #cbd5e1 !important;
 }
-.maplibregl-ctrl-attrib-button {
+.dark .maplibregl-ctrl-attrib-button {
   filter: invert(1);
 }
 
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: rgb(255 255 255 / 0.12) transparent;
+  scrollbar-color: rgb(var(--overlay) / 0.15) transparent;
 }

@@ -3,6 +3,7 @@ import Map, { AttributionControl, NavigationControl, ScaleControl, type MapLayer
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useRouteGeometries } from "../../api/hooks";
 import { bounds } from "../../lib/geo";
+import { useTheme } from "../../store/useTheme";
 import { useTripStore } from "../../store/useTripStore";
 import { CheckpointLayer } from "./CheckpointLayer";
 import { HeatmapLayer } from "./HeatmapLayer";
@@ -11,7 +12,10 @@ import { EndpointMarkers, TruckMarkers } from "./TruckMarkers";
 
 // On phones the forecast panel covers the bottom of the map.
 const IS_PHONE = typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches;
-const MAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+const MAP_STYLES = {
+  light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+  dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+};
 const INTERACTIVE = ["checkpoints", "route-hit"];
 
 export function TripMap() {
@@ -19,6 +23,7 @@ export function TripMap() {
   const [labelLayerId, setLabelLayerId] = useState<string>();
   const [cursor, setCursor] = useState("");
   const geometries = useRouteGeometries();
+  const theme = useTheme((s) => s.theme);
   const selectRoute = useTripStore((s) => s.selectRoute);
   const openPopup = useTripStore((s) => s.openPopup);
   const popupCheckpoint = useTripStore((s) => s.popupCheckpoint);
@@ -46,11 +51,19 @@ export function TripMap() {
     }
   }, [popupCheckpoint, selectedRoute]);
 
-  const onLoad = useCallback(() => {
-    // Draw the heatmap under the place labels so city names stay readable.
-    const layers = mapRef.current?.getStyle().layers ?? [];
+  // Draw the heatmap under the place labels so city names stay readable.
+  // Re-checked whenever the basemap (light or dark) changes.
+  const findLabelLayer = useCallback(() => {
+    const layers = mapRef.current?.getStyle()?.layers ?? [];
     setLabelLayerId(layers.find((l) => l.type === "symbol")?.id);
   }, []);
+  const onLoad = findLabelLayer;
+
+  useEffect(() => {
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+    map.once("style.load", findLabelLayer);
+  }, [theme, findLabelLayer]);
 
   const onClick = useCallback(
     (e: MapLayerMouseEvent) => {
@@ -69,7 +82,7 @@ export function TripMap() {
     <Map
       ref={mapRef}
       initialViewState={{ longitude: -97, latitude: 39, zoom: 3.6 }}
-      mapStyle={MAP_STYLE}
+      mapStyle={MAP_STYLES[theme]}
       interactiveLayerIds={INTERACTIVE}
       onClick={onClick}
       onLoad={onLoad}

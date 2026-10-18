@@ -36,7 +36,8 @@ export const HEAT_STYLES: Record<HeatLayer, { color: unknown; opacity: unknown }
  */
 export function HeatmapLayer({ beforeId }: { beforeId?: string }) {
   const { data } = useHeatmap();
-  const hour = useTripStore((s) => s.hour);
+  // Forecast data is hourly, so the heatmap only changes on whole hours.
+  const hour = useTripStore((s) => Math.floor(s.hour));
   const layer = useTripStore((s) => s.heatLayer);
 
   const geojson = useMemo<FeatureCollection<Point>>(() => {

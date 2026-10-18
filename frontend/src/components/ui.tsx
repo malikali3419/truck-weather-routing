@@ -25,7 +25,7 @@ export function Segmented<T extends string | number | null>({
   className?: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className={`flex gap-0.5 rounded-xl bg-white/[0.04] p-1 ring-1 ring-inset ring-white/[0.06] ${className}`}>
+    <div role="radiogroup" aria-label={label} className={`flex gap-0.5 rounded-xl bg-overlay/[0.04] p-1 ring-1 ring-inset ring-overlay/[0.06] ${className}`}>
       {options.map((o) => {
         const active = o.value === value;
         return (
@@ -38,7 +38,7 @@ export function Segmented<T extends string | number | null>({
             onClick={() => onChange(o.value)}
             className={`flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg font-medium transition ${
               size === "sm" ? "px-2 py-1 text-xs" : "px-3 py-1.5 text-sm"
-            } ${active ? "bg-white/[0.1] text-white shadow-sm ring-1 ring-inset ring-white/10" : "text-slate-400 hover:text-slate-100"}`}
+            } ${active ? "bg-white text-fg shadow-sm ring-1 ring-inset ring-overlay/10 dark:bg-overlay/[0.1]" : "text-muted hover:text-fg"}`}
           >
             {o.label}
           </button>
@@ -78,7 +78,7 @@ export function RiskRibbon({
     .filter(Boolean)
     .join(", ");
   return (
-    <div className={`relative w-full overflow-hidden rounded-full bg-white/[0.06] ${height}`} role="img" aria-label={summary}>
+    <div className={`relative w-full overflow-hidden rounded-full bg-overlay/[0.06] ${height}`} role="img" aria-label={summary}>
       {segments.map((s) => (
         <div
           key={s.from_mi}
@@ -96,7 +96,7 @@ export function RiskRibbon({
 
 export function RiskLegend({ className = "" }: { className?: string }) {
   return (
-    <ul className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400 ${className}`}>
+    <ul className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted ${className}`}>
       {LEVELS.map((l) => (
         <li key={l} className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full" style={{ background: RISK_COLOR[l], boxShadow: `0 0 6px ${RISK_COLOR[l]}` }} />
@@ -109,8 +109,8 @@ export function RiskLegend({ className = "" }: { className?: string }) {
 
 export function Skeleton({ className = "" }: { className?: string }) {
   return (
-    <div className={`relative overflow-hidden rounded-lg bg-white/[0.06] ${className}`}>
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+    <div className={`relative overflow-hidden rounded-lg bg-overlay/[0.06] ${className}`}>
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-overlay/[0.08] to-transparent" />
     </div>
   );
 }

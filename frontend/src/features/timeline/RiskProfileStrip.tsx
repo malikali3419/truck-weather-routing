@@ -1,3 +1,4 @@
+import { Truck } from "lucide-react";
 import { useMemo, useRef, type MouseEvent } from "react";
 import { formatTime } from "../../lib/format";
 import { RISK_COLOR, RISK_LABEL } from "../../lib/risk";
@@ -46,8 +47,8 @@ export function RiskProfileStrip() {
 
   return (
     <div>
-      <div className="mb-1.5 flex items-baseline justify-between text-[11px] text-slate-400">
-        <span className="font-semibold text-slate-200">Route {route.id} along the way</span>
+      <div className="mb-1.5 flex items-baseline justify-between text-[11px] text-muted">
+        <span className="font-semibold text-fg">Route {route.id} along the way</span>
         {cp ? (
           <span>
             Mile {Math.round(cp.mile)} · {formatTime(cp.eta_unix)} ·{" "}
@@ -56,12 +57,12 @@ export function RiskProfileStrip() {
             </span>
           </span>
         ) : (
-          <span>Hover to inspect · dot = truck at slider time</span>
+          <span>Hover to inspect · truck = position at slider time</span>
         )}
       </div>
       <div
         ref={bar}
-        className="relative h-3 cursor-crosshair rounded-full bg-white/[0.06]"
+        className="relative h-3 cursor-crosshair rounded-full bg-overlay/[0.06]"
         data-testid="risk-strip"
         onMouseMove={(e) => focusCheckpoint(nearest(e))}
         onMouseLeave={() => focusCheckpoint(null)}
@@ -79,15 +80,18 @@ export function RiskProfileStrip() {
           />
         ))}
         {cp && (
-          <div className="absolute -inset-y-1 w-0.5 rounded bg-white" style={{ left: `${(cp.mile / total) * 100}%` }} />
+          <div className="absolute -inset-y-1 w-0.5 rounded bg-fg" style={{ left: `${(cp.mile / total) * 100}%` }} />
         )}
         <div
-          className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-indigo-500 shadow-[0_0_0_4px_rgba(99,102,241,0.3),0_4px_12px_rgba(0,0,0,0.6)]"
+          className="pointer-events-none absolute top-1/2 flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-sky-400 to-indigo-500 text-white shadow-[0_4px_12px_rgba(0,0,0,0.35)]"
           style={{ left: `${(truckMile / total) * 100}%` }}
           title="Truck position at slider time"
-        />
+          data-testid="strip-truck"
+        >
+          <Truck className="h-3.5 w-3.5" strokeWidth={2.2} />
+        </div>
       </div>
-      <div className="mt-1 flex justify-between text-[10px] tabular-nums text-slate-500">
+      <div className="mt-1 flex justify-between text-[10px] tabular-nums text-subtle">
         <span>0 mi</span>
         <span>{Math.round(total / 2)} mi</span>
         <span>{Math.round(total)} mi</span>
